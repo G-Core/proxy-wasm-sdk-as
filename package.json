@@ -7,7 +7,7 @@
     "docs": "typedoc --out ./docs assembly --ignoreCompilerErrors --name 'AssemblyScript Proxy Runtime'"
   },
   "devDependencies": {
-    "assemblyscript": "^0.25.0",
+    "assemblyscript": "^0.27.34",
     "http-server": "^0.12.3",
     "local-web-server": "^3.0.7",
     "minimist": ">=1.2.2",
@@ -15,14 +15,14 @@
   },
   "name": "@kong/proxy-wasm-sdk",
   "description": "Use this SDK to write extensions for the proxy WASM ABI",
-  "version": "0.0.6",
+  "version": "0.0.1",
   "main": "assembly/index.ts",
   "directories": {
     "doc": "docs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kong/proxy-wasm-assemblyscript-sdk.git"
+    "url": "git+https://github.com/G-Core/proxy-wasm-sdk-as.git"
   },
   "keywords": [
     "wasm",
@@ -31,9 +31,9 @@
   "author": "Yuval Kohavi",
   "license": " Apache-2.0",
   "bugs": {
-    "url": "https://github.com/kong/proxy-wasm-assemblyscript-sdk/issues"
+    "url": "https://github.com/G-Core/proxy-wasm-sdk-as/issues"
   },
-  "homepage": "https://github.com/kong/proxy-wasm-assemblyscript-sdk",
+  "homepage": "https://github.com/G-Core/proxy-wasm-sdk-as",
   "files": [
     "/assembly",
     "package-lock.json",

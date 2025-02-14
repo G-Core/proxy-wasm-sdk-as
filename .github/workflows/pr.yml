@@ -1,22 +1,30 @@
-name: check-pr
+name: Pull Request Requirements
+
 on:
-  push:
-    branches:
-    - 'master'
-  pull_request: {}
+  pull_request:
+    branches: ["master"]
+
 jobs:
-  check-pr:
-    name: check-pr
-    runs-on: ubuntu-latest
+  unit_tests:
+    runs-on: [self-hosted, ubuntu-22-04, regular]
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2.1.0
-    - name: Set up Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.17.0
-    - run: npm install
-    - run: npm run asbuild
-    # make sure example filter builds:
-    - run: cd examples/auth && npm install && npm run asbuild
-    - run: cd examples/addheader && npm install && npm run asbuild
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js version 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Build
+        run: npm run asbuild
+
+      - name: Build and run Auth example
+        run: cd examples/auth && npm install && npm run asbuild
+
+      - name: Build and run Add Header example
+        run: cd examples/addheader && npm install && npm run asbuild
