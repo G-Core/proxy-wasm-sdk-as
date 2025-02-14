@@ -7,13 +7,14 @@
     "docs": "typedoc --out ./docs assembly --ignoreCompilerErrors --name 'AssemblyScript Proxy Runtime'"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
     "assemblyscript": "^0.27.34",
     "http-server": "^0.12.3",
     "local-web-server": "^3.0.7",
     "minimist": ">=1.2.2",
     "typedoc": "^0.16.11"
   },
-  "name": "@kong/proxy-wasm-sdk",
+  "name": "@gcoredev/proxy-wasm-sdk-as",
   "description": "Use this SDK to write extensions for the proxy WASM ABI",
   "version": "0.0.1",
   "main": "assembly/index.ts",

@@ -1,27 +1,35 @@
-name: Publish package to npm
+name: Release
+
 on:
-  workflow_dispatch: # trigger manually
+  workflow_call:
     inputs:
       dry_run:
-        description: "NPM release dry-run"
         required: true
-        default: "true"
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+      VAULT_TOKEN:
+        required: true
 
 jobs:
-  build:
+  release:
+    name: NPM Release
     runs-on: [self-hosted, ubuntu-22-04, regular]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Setup Node.js version 20.x
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
 
       - name: Install dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Dry Run Status
         id: dry_run
@@ -43,7 +51,9 @@ jobs:
           secrets: |
             secret/project_fastedge/npmjs token | NPM_TOKEN
 
-      - name: Publish to NPM
-        run: npm publish ${{ steps.dry_run.outputs.dry_run }} --access public
+      - name: Semantic Release
         env:
-          NODE_AUTH_TOKEN: ${{ steps.secrets.outputs.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ steps.secrets.outputs.NPM_TOKEN }}
+          CI: true # Used to bypass husky hooks
+        run: npx semantic-release ${{ steps.dry_run.outputs.dry_run }}
