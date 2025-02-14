@@ -2,7 +2,7 @@ name: Pull Request Requirements
 
 on:
   pull_request:
-    branches: ["master"]
+    branches: ["*.*.x", "*.x", "master", "next", "next-major", "beta", "alpha"]
 
 jobs:
   unit_tests:
