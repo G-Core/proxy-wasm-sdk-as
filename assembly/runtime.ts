@@ -20,6 +20,10 @@ import { free } from "./malloc";
 
 function CHECK_RESULT(c: imports.WasmResult): void {
   if (c != WasmResultValues.Ok) {
+    if (c == WasmResultValues.NotFound) {
+      log(LogLevelValues.debug, "Not found");
+      return;
+    }
     log(LogLevelValues.critical, c.toString());
     throw new Error(":(");
   }
@@ -212,7 +216,7 @@ export enum StreamTypeValues {
 
 export function log(level: LogLevelValues, logMessage: string): void {
   // from the docs:
-  // Like JavaScript, AssemblyScript stores strings in UTF-16 encoding represented by the API as UCS-2, 
+  // Like JavaScript, AssemblyScript stores strings in UTF-16 encoding represented by the API as UCS-2,
   let buffer = String.UTF8.encode(logMessage);
   imports.proxy_log(level as imports.LogLevel, changetype<usize>(buffer), buffer.byteLength);
 }
@@ -513,7 +517,7 @@ class HeaderStreamManipulator {
 /**
  * Manipulate request and response headers.
  * Note that request header manipulation will only have effect before the request goes upstream.
- * Response header manipulation can happen only after the response was started and before it 
+ * Response header manipulation can happen only after the response was started and before it
  * was sent downstream.
  */
 class HeaderMapManipulator {
@@ -730,8 +734,8 @@ export function get_metric(metric_id: u32): MetricData {
 
 export function done(): WasmResultValues { return imports.proxy_done(); }
 
-//Only exporting this function while we are still working on the http call support. 
-//Once we decided how to read http response headers and pass those to the callback function, 
+//Only exporting this function while we are still working on the http call support.
+//Once we decided how to read http response headers and pass those to the callback function,
 // we should remove this export and make sure this proxy call is only made thru BaseContext.setEffectiveContext().
 export function proxy_set_effective_context(_id: u32): WasmResultValues {
   const result = imports.proxy_set_effective_context(_id);
@@ -763,10 +767,10 @@ export function call_foreign_function(function_name: string, argument: string): 
 
 /**
  * Sets the effective context id to this context. this is useful for example if you receive an
- * http call in a RootContext, and want to modify headers based on the response in a regular 
+ * http call in a RootContext, and want to modify headers based on the response in a regular
  * Context. You then will call `setEffectiveContext(_id)` so that the header manipulation will
  * occur in the request context and not in the root context.
- * @param _id 
+ * @param _id
  */
 function setEffectiveContext(_id: u32): WasmResultValues {
   return proxy_set_effective_context(_id);
@@ -894,7 +898,7 @@ export class RootContext extends BaseContext {
     log(LogLevelValues.debug, "context id: " + this.context_id.toString() + ": onTick()");
   }
 
-  // Calleed when 
+  // Calleed when
   onQueueReady(token: u32): void {
     log(LogLevelValues.debug, "context id: " + this.context_id.toString() + ": onQueueReady(token:" + token.toString() + ")");
   }
@@ -957,13 +961,13 @@ export class RootContext extends BaseContext {
   on_grpc_close(token: u32, status_code: u32): void { }
 
   /*
-  grpc_call(service_proto:ArrayBuffer, service_name:string, method_name:string, request :ArrayBuffer, timeout_milliseconds : u32): WasmResultValues { 
+  grpc_call(service_proto:ArrayBuffer, service_name:string, method_name:string, request :ArrayBuffer, timeout_milliseconds : u32): WasmResultValues {
     let service_name_buffer = String.UTF8.encode(service_name);
     let method_name_buffer = String.UTF8.encode(method_name);
     let token = globalU32Ref;
     let result = imports.proxy_grpc_call(changetype<usize>(service_proto), service_proto.byteLength,
-    changetype<usize>(service_name_buffer), service_name_buffer.byteLength, 
-    changetype<usize>(method_name_buffer), method_name_buffer.byteLength, 
+    changetype<usize>(service_name_buffer), service_name_buffer.byteLength,
+    changetype<usize>(method_name_buffer), method_name_buffer.byteLength,
     changetype<usize>(request), request.byteLength, timeout_milliseconds, token.ptr());
     if (result == WasmResultValues.Ok) {
     this.grpc_calls_.set(token.data, new GrpcCallback(ctx, cb));

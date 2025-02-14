@@ -1,8 +1,8 @@
 # WebAssembly for Proxies (AssemblyScript SDK)
 
-This is a friendly fork of https://github.com/solo-io/proxy-runtime/,
+This is a friendly fork of https://github.com/Kong/proxy-wasm-assemblyscript-sdk/,
 temporarily mantained to address an incompatibility between the AssemblyScript
-SDK and ngx_wasm_module.
+SDK and the Rust SDK.
 
 ## How to use this SDK
 
@@ -16,6 +16,7 @@ npx asinit .
 
 Include `"use": "abort=abort_proc_exit"` to the `asconfig.json` file as part of
 the options passed to `asc` compiler:
+
 ```
 {
   "options": {
@@ -25,7 +26,6 @@ the options passed to `asc` compiler:
 ```
 
 Add `"@kong/proxy-wasm-sdk": "0.0.6"` to your dependencies then run `npm install`.
-
 
 ## Hello, World
 
@@ -38,7 +38,7 @@ import {
   Context,
   registerRootContext,
   FilterHeadersStatusValues,
-  stream_context
+  stream_context,
 } from "@kong/proxy-wasm-sdk";
 
 class AddHeaderRoot extends RootContext {
@@ -56,38 +56,47 @@ class AddHeader extends Context {
     if (root_context.getConfiguration() == "") {
       stream_context.headers.response.add("hello", "world!");
     } else {
-      stream_context.headers.response.add("hello", root_context.getConfiguration());
+      stream_context.headers.response.add(
+        "hello",
+        root_context.getConfiguration()
+      );
     }
     return FilterHeadersStatusValues.Continue;
   }
 }
 
-registerRootContext((context_id: u32) => { return new AddHeaderRoot(context_id); }, "add_header");
+registerRootContext((context_id: u32) => {
+  return new AddHeaderRoot(context_id);
+}, "add_header");
 ```
+
 ## build
 
 To build, simply run:
+
 ```
 npm run asbuild
 ```
 
-build results will be in the build folder. `untouched.wasm` and `optimized.wasm` are the compiled 
+build results will be in the build folder. `untouched.wasm` and `optimized.wasm` are the compiled
 file that we will use (you only need one of them, if unsure use `optimized.wasm`).
 
 ## Run
+
 Configure envoy with your filter:
+
 ```yaml
-          - name: envoy.filters.http.wasm
-            config:
-              config:
-                name: "add_header"
-                root_id: "add_header"
-                configuration: "what ever you want"
-                vm_config:
-                  vm_id: "my_vm_id"
-                  runtime: "envoy.wasm.runtime.v8"
-                  code:
-                    local:
-                      filename: /PATH/TO/CODE/build/optimized.wasm
-                  allow_precompiled: false
+- name: envoy.filters.http.wasm
+  config:
+    config:
+      name: "add_header"
+      root_id: "add_header"
+      configuration: "what ever you want"
+      vm_config:
+        vm_id: "my_vm_id"
+        runtime: "envoy.wasm.runtime.v8"
+        code:
+          local:
+            filename: /PATH/TO/CODE/build/optimized.wasm
+        allow_precompiled: false
 ```
