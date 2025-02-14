@@ -2,7 +2,7 @@ name: Pull Request Requirements
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["master"]
 
 jobs:
   unit_tests:
