@@ -6,9 +6,9 @@
     "test": "node tests"
   },
   "dependencies": {
-    "@kong/proxy-wasm-sdk": "file:../.."
+    "@gcoredev/proxy-wasm-sdk-as": "file:../.."
   },
   "devDependencies": {
-    "assemblyscript": "^0.25.0"
+    "assemblyscript": "^0.27.34"
   }
 }

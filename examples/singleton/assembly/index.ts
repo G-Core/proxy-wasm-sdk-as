@@ -1,20 +1,34 @@
-
-export * from "@kong/proxy-wasm-sdk/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
+export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
 //this.setEffectiveContext(callback.origin_context_id);
 import {
-  RootContext, Context, BaseContext, registerRootContext, Headers, makeHeaderPair, log,
-  BufferTypeValues, LogLevelValues, FilterHeadersStatusValues, FilterDataStatusValues,
-  FilterTrailersStatusValues, GrpcStatusValues, WasmResultValues, stream_context,
-  send_http_response, set_tick_period_milliseconds, get_buffer_bytes, set_shared_data, get_shared_data
-} from "@kong/proxy-wasm-sdk/assembly";
+  RootContext,
+  Context,
+  BaseContext,
+  registerRootContext,
+  Headers,
+  makeHeaderPair,
+  log,
+  BufferTypeValues,
+  LogLevelValues,
+  FilterHeadersStatusValues,
+  FilterDataStatusValues,
+  FilterTrailersStatusValues,
+  GrpcStatusValues,
+  WasmResultValues,
+  stream_context,
+  send_http_response,
+  set_tick_period_milliseconds,
+  get_buffer_bytes,
+  set_shared_data,
+  get_shared_data,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly";
 
 class AuthSingleton extends RootContext {
-
   onConfigure(configuration_size: u32): bool {
     super.onConfigure(configuration_size);
     log(LogLevelValues.info, "singleton onConfigure! ");
     set_tick_period_milliseconds(1000);
-    return true
+    return true;
   }
 
   onTick(): void {
@@ -27,24 +41,36 @@ class AuthSingleton extends RootContext {
     h.push(makeHeaderPair(":method", "GET"));
     h.push(makeHeaderPair(":authority", "foo"));
     let cluster = this.getConfiguration();
-    log(LogLevelValues.info, "singleton updateConfig! "+cluster);
+    log(LogLevelValues.info, "singleton updateConfig! " + cluster);
 
-    let result = this.httpCall(cluster,
+    let result = this.httpCall(
+      cluster,
       // provide the auth cluster our headers, so it can make an auth decision.
       h,
       // no need for body or trailers
-      new ArrayBuffer(0), [],
+      new ArrayBuffer(0),
+      [],
       // 1 second timeout
       1000,
       // pass us, so that the callback receives us back.
       // once AssemblyScript supports closures, this will not be needed.
       this,
       // http callback: called when there's a response. if the request failed, headers will be 0
-      (origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => {
+      (
+        origin_context: BaseContext,
+        headers: u32,
+        body_size: usize,
+        trailers: u32
+      ) => {
         log(LogLevelValues.info, "callback called!");
-        let bytes = get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size);
+        let bytes = get_buffer_bytes(
+          BufferTypeValues.HttpCallResponseBody,
+          0,
+          body_size
+        );
         set_shared_data("data", bytes);
-      });
+      }
+    );
   }
 }
 class AuthRoot extends RootContext {
@@ -56,7 +82,7 @@ class AuthRoot extends RootContext {
   }
   onConfigure(configuration_size: u32): bool {
     set_tick_period_milliseconds(1000);
-    return true
+    return true;
   }
 
   onTick(): void {
@@ -99,11 +125,14 @@ class Auth extends Context {
 
     return FilterHeadersStatusValues.StopIteration;
   }
-
 }
 
-registerRootContext((context_id: u32) => { return new AuthRoot(context_id); }, "auth");
-registerRootContext((context_id: u32) => { return new AuthSingleton(context_id); }, "auth_singleton");
+registerRootContext((context_id: u32) => {
+  return new AuthRoot(context_id);
+}, "auth");
+registerRootContext((context_id: u32) => {
+  return new AuthSingleton(context_id);
+}, "auth_singleton");
 
 // Test by curling with foo header:
 // curl localhost:8080/ -H"x-auth: foo"
