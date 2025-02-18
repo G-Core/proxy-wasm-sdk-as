@@ -1,4 +1,4 @@
-export * from "@kong/proxy-wasm-sdk/assembly/proxy";
+export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy";
 import {
   RootContext,
   Context,
@@ -7,15 +7,14 @@ import {
   FilterDataStatusValues,
   stream_context,
   log,
-  LogLevelValues
-} from "@kong/proxy-wasm-sdk/assembly";
+  LogLevelValues,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly";
 class RemoveHeadersRoot extends RootContext {
   createContext(context_id: u32): Context {
     return new RemoveHeader(context_id, this);
   }
 }
 class RemoveHeader extends Context {
-
   token_str: string;
   rm_tokens: Array<string> = new Array<string>(10);
 
@@ -25,8 +24,13 @@ class RemoveHeader extends Context {
     if (this.token_str != "") {
       // establish array of tokens to remove from response headers
       this.rm_tokens = this.token_str.split(",");
-      log(LogLevelValues.debug, "rm-headers: token count: " + this.rm_tokens.length.toString() 
-        + " token[0]: " + this.rm_tokens[0]);
+      log(
+        LogLevelValues.debug,
+        "rm-headers: token count: " +
+          this.rm_tokens.length.toString() +
+          " token[0]: " +
+          this.rm_tokens[0]
+      );
     }
   }
 
@@ -34,7 +38,10 @@ class RemoveHeader extends Context {
     const root_context = this.root_context;
     log(LogLevelValues.trace, "onResponseHeaders called!");
     if (this.token_str == "") {
-      log(LogLevelValues.trace, "rm-headers: no config specified - skipping this response");
+      log(
+        LogLevelValues.trace,
+        "rm-headers: no config specified - skipping this response"
+      );
       return FilterHeadersStatusValues.Continue;
     }
 
@@ -43,13 +50,19 @@ class RemoveHeader extends Context {
     // search all header keys for the configured tokens and remove the matching headers from response
     for (let i: u32 = 0; i < num_hdrs; i++) {
       let hdr_key: string = String.UTF8.decode(hdr_arr[i].key);
-      log(LogLevelValues.debug, "onResponseHeaders processing header: " + hdr_key);
+      log(
+        LogLevelValues.debug,
+        "onResponseHeaders processing header: " + hdr_key
+      );
       let num_tokens: u32 = this.rm_tokens.length;
       for (let j: u32 = 0; j < num_tokens; j++) {
         let rm_token: string = this.rm_tokens[j];
         if (hdr_key.startsWith(rm_token)) {
           stream_context.headers.response.remove(hdr_key);
-          log(LogLevelValues.debug, "onResponseHeaders removed header: " + hdr_key);
+          log(
+            LogLevelValues.debug,
+            "onResponseHeaders removed header: " + hdr_key
+          );
           break;
         }
       }
@@ -58,4 +71,6 @@ class RemoveHeader extends Context {
     return FilterHeadersStatusValues.Continue;
   }
 }
-registerRootContext((context_id: u32) => { return new RemoveHeadersRoot(context_id); }, "remove_headers");
+registerRootContext((context_id: u32) => {
+  return new RemoveHeadersRoot(context_id);
+}, "remove_headers");
