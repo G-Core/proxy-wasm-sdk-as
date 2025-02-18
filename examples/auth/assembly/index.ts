@@ -1,15 +1,25 @@
-
-export * from "@kong/proxy-wasm-sdk/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
+export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
 
 import {
-  RootContext, Context, BaseContext, registerRootContext,
-  log, LogLevelValues, FilterHeadersStatusValues, FilterDataStatusValues,
-  FilterTrailersStatusValues, GrpcStatusValues, WasmResultValues,
-  stream_context, send_http_response, continue_request, get_buffer_bytes, BufferTypeValues
-} from "@kong/proxy-wasm-sdk/assembly";
+  RootContext,
+  Context,
+  BaseContext,
+  registerRootContext,
+  log,
+  LogLevelValues,
+  FilterHeadersStatusValues,
+  FilterDataStatusValues,
+  FilterTrailersStatusValues,
+  GrpcStatusValues,
+  WasmResultValues,
+  stream_context,
+  send_http_response,
+  continue_request,
+  get_buffer_bytes,
+  BufferTypeValues,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly";
 
 class AuthRoot extends RootContext {
-
   createContext(context_id: u32): Context {
     log(LogLevelValues.debug, "AuthRoot createContext called!");
     return new Auth(context_id, this);
@@ -28,18 +38,25 @@ class Auth extends Context {
     let cluster = this.root_context.getConfiguration();
     log(LogLevelValues.debug, "onRequestHeaders called!" + cluster);
     // make an http call to the auth cluster
-    let result = this.root_context.httpCall(cluster,
+    let result = this.root_context.httpCall(
+      cluster,
       // provide the auth cluster our headers, so it can make an auth decision.
       stream_context.headers.request.get_headers(),
       // no need for body or trailers
-      new ArrayBuffer(0), [],
+      new ArrayBuffer(0),
+      [],
       // 1 second timeout
       1000,
       // pass us, so that the callback receives us back.
       // once AssemblyScript supports closures, this will not be needed.
       this,
       // http callback: called when there's a response. if the request failed, headers will be 0
-      (origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => {
+      (
+        origin_context: BaseContext,
+        headers: u32,
+        body_size: usize,
+        trailers: u32
+      ) => {
         let context = changetype<Auth>(origin_context);
         let allow = false;
 
@@ -47,13 +64,27 @@ class Auth extends Context {
           // if we have a response, allow the request if we have a 200
           log(LogLevelValues.debug, "callback called!");
           let status = stream_context.headers.http_callback.get(":status");
-          log(LogLevelValues.debug, "status:" + status + ", headers: " + headers.toString() + ", body_size: " + body_size.toString() + ", trailers: " + trailers.toString());
+          log(
+            LogLevelValues.debug,
+            "status:" +
+              status +
+              ", headers: " +
+              headers.toString() +
+              ", body_size: " +
+              body_size.toString() +
+              ", trailers: " +
+              trailers.toString()
+          );
           if (status == "200") {
             allow = true;
           }
         }
 
-         let buf = get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32);
+        let buf = get_buffer_bytes(
+          BufferTypeValues.HttpCallResponseBody,
+          0,
+          body_size as u32
+        );
         log(LogLevelValues.debug, "auth body: " + String.UTF8.decode(buf));
 
         if (allow) {
@@ -65,7 +96,8 @@ class Auth extends Context {
           // we are denied, send a local response indicating that.
           send_http_response(401, "not authorized", new ArrayBuffer(0), []);
         }
-      });
+      }
+    );
 
     if (result != WasmResultValues.Ok) {
       log(LogLevelValues.debug, "auth failed http call: " + result.toString());
@@ -83,13 +115,19 @@ class Auth extends Context {
     return FilterHeadersStatusValues.StopIteration;
   }
 
-  onResponseHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues {
+  onResponseHeaders(
+    headers: u32,
+    end_of_stream: bool
+  ): FilterHeadersStatusValues {
     log(LogLevelValues.info, "response headers");
     stream_context.headers.response.add("hello", "wasm!");
     return FilterHeadersStatusValues.Continue;
   }
 
-  onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues {
+  onRequestBody(
+    body_buffer_length: usize,
+    end_of_stream: bool
+  ): FilterDataStatusValues {
     // Only pass upstream if allowed
     if (this.allow) {
       return FilterDataStatusValues.Continue;
@@ -98,7 +136,6 @@ class Auth extends Context {
     return FilterDataStatusValues.StopIterationAndWatermark;
   }
   onRequestTrailers(a: u32): FilterTrailersStatusValues {
-
     // Only pass upstream if allowed
     if (this.allow) {
       return FilterTrailersStatusValues.Continue;
@@ -108,4 +145,6 @@ class Auth extends Context {
   }
 }
 
-registerRootContext((context_id: u32) => { return new AuthRoot(context_id); }, "auth");
+registerRootContext((context_id: u32) => {
+  return new AuthRoot(context_id);
+}, "auth");

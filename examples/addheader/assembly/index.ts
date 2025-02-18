@@ -1,6 +1,11 @@
-
-export * from "@kong/proxy-wasm-sdk/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
-import { RootContext, Context, registerRootContext, FilterHeadersStatusValues, stream_context } from "@kong/proxy-wasm-sdk/assembly";
+export * from "@gcoredev/proxy-wasm-sdk-as/assembly"; // this exports the required functions for the proxy to interact with us.
+import {
+  RootContext,
+  Context,
+  registerRootContext,
+  FilterHeadersStatusValues,
+  stream_context,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly";
 
 class AddHeaderRoot extends RootContext {
   createContext(context_id: u32): Context {
@@ -17,10 +22,15 @@ class AddHeader extends Context {
     if (root_context.getConfiguration() == "") {
       stream_context.headers.response.add("hello", "world!");
     } else {
-      stream_context.headers.response.add("hello", root_context.getConfiguration());
+      stream_context.headers.response.add(
+        "hello",
+        root_context.getConfiguration()
+      );
     }
     return FilterHeadersStatusValues.Continue;
   }
 }
 
-registerRootContext((context_id: u32) => { return new AddHeaderRoot(context_id); }, "add_header");
+registerRootContext((context_id: u32) => {
+  return new AddHeaderRoot(context_id);
+}, "add_header");
