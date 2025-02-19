@@ -1,5 +1,6 @@
 # WebAssembly for Proxies (AssemblyScript SDK)
 
+
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/G-Core/proxy-wasm-sdk-as/deploy.yaml)](https://github.com/G-Core/proxy-wasm-sdk-as)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/t/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as)
 [![GitHub top language](https://img.shields.io/github/languages/top/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as)
