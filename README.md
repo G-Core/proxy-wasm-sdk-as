@@ -17,7 +17,7 @@ npx asinit .
 Include `"use": "abort=abort_proc_exit"` to the `asconfig.json` file as part of
 the options passed to `asc` compiler:
 
-```
+```json
 {
   "options": {
     "use": "abort=abort_proc_exit"
