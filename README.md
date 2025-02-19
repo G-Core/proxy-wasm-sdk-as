@@ -1,5 +1,11 @@
 # WebAssembly for Proxies (AssemblyScript SDK)
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/G-Core/proxy-wasm-sdk-as/deploy.yaml)](https://github.com/G-Core/proxy-wasm-sdk-as)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/t/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as)
+[![GitHub top language](https://img.shields.io/github/languages/top/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as)
+[![GitHub License](https://img.shields.io/github/license/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as/blob/main/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/@gcoredev/proxy-wasm-sdk-as)](https://www.npmjs.com/package/@gcoredev/proxy-wasm-sdk-as)
+
 This is a friendly fork of https://github.com/Kong/proxy-wasm-assemblyscript-sdk/,
 temporarily mantained to address an incompatibility between the AssemblyScript
 SDK and the Rust SDK.
