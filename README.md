@@ -32,7 +32,7 @@ the options passed to `asc` compiler:
 }
 ```
 
-Add `"@gcoredev/proxy-wasm-sdk-as": "1.0.2"` to your dependencies then run `npm install`.
+Add `"@gcoredev/proxy-wasm-sdk-as": "^1.0.2"` to your dependencies then run `npm install`.
 
 ## Hello, World
 
