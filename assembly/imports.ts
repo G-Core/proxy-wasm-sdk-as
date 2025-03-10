@@ -173,3 +173,16 @@ export declare function proxy_call_foreign_function(function_name: ptr<char>,
   name_size: size_t, arguments: ptr<char>,
   arguments_size: size_t, results: ptr<ptr<char>>,
   results_size: ptr<size_t>): WasmResult;
+
+// FastEdge HOST Apis
+
+// Secrets
+// @ts-ignore: decorator
+@external("env", "proxy_get_secret")
+export declare function proxy_get_secret(
+  key_data: usize,
+  key_size: usize,
+  return_value_data: usize,
+  return_value_size: usize
+): u32;
+
