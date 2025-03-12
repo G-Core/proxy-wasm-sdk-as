@@ -9,6 +9,7 @@
     "@gcoredev/proxy-wasm-sdk-as": "file:../.."
   },
   "devDependencies": {
+    "@assemblyscript/wasi-shim": "^0.1.0",
     "assemblyscript": "^0.27.34"
   }
 }
