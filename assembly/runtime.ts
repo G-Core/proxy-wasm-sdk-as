@@ -69,7 +69,7 @@ class ArrayBufferReference {
   }
 }
 
-var globalArrayBufferReference = new ArrayBufferReference();
+export const globalArrayBufferReference = new ArrayBufferReference();
 let globalU32Ref = new Reference<u32>();
 let globalLogLevelRef = new Reference<imports.LogLevel>();
 let globalU64Ref = new Reference<u64>();
