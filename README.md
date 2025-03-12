@@ -58,7 +58,7 @@ class AddHeader extends Context {
   constructor(context_id: u32, root_context: AddHeaderRoot) {
     super(context_id, root_context);
   }
-  onResponseHeaders(a: u32, end_of_stream: boolean): FilterHeadersStatusValues {
+  onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     const root_context = this.root_context;
     if (root_context.getConfiguration() == "") {
       stream_context.headers.response.add("hello", "world!");

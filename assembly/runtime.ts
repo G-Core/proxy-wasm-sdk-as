@@ -1,6 +1,8 @@
 import * as imports from "./imports";
 import { free } from "./malloc";
 
+import { log as wasiLog } from "./fastedge";
+
 // abort function.
 // use with:
 // --use abort=index/abort_proc_exit
@@ -217,8 +219,11 @@ export enum StreamTypeValues {
 export function log(level: LogLevelValues, logMessage: string): void {
   // from the docs:
   // Like JavaScript, AssemblyScript stores strings in UTF-16 encoding represented by the API as UCS-2,
-  let buffer = String.UTF8.encode(logMessage);
-  imports.proxy_log(level as imports.LogLevel, changetype<usize>(buffer), buffer.byteLength);
+  // let buffer = String.UTF8.encode(logMessage);
+  // imports.proxy_log(level as imports.LogLevel, changetype<usize>(buffer), buffer.byteLength);
+
+  // Temporary fix for proxy_log not being implemented in fastedge:
+  wasiLog(level, logMessage);
 }
 
 export function logLevel(): LogLevelValues {

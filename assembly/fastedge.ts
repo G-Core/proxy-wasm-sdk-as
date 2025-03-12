@@ -43,4 +43,24 @@ export function getSecretVar(key: string): string {
   return String.UTF8.decode(arrBuff);
 }
 
+export function getSecretVarEffectiveAt(key: string, at: u32): string {
+  const buffer = String.UTF8.encode(key);
+  const status = imports.proxy_get_effective_at_secret(
+    changetype<usize>(buffer),
+    buffer.byteLength,
+    at,
+    globalArrayBufferReference.bufferPtr(),
+    globalArrayBufferReference.sizePtr()
+  );
+  if (status != 0) {
+    // Something went wrong - returns 0 with an empty ArrayBuffer if not found
+    return "";
+  }
+  const arrBuff = globalArrayBufferReference.toArrayBuffer();
+  if (arrBuff.byteLength == 0) {
+    return ""; // Not found
+  }
+  return String.UTF8.decode(arrBuff);
+}
+
 export { LogLevelValues };
