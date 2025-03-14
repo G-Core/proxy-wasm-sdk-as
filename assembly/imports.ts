@@ -186,3 +186,14 @@ export declare function proxy_get_secret(
   return_value_size: usize
 ): u32;
 
+
+// @ts-ignore: decorator
+@external("env", "proxy_get_effective_at_secret")
+export declare function proxy_get_effective_at_secret(
+  key_data: usize,
+  key_size: usize,
+  at: u32,
+  return_value_data: usize,
+  return_value_size: usize
+): u32;
+
