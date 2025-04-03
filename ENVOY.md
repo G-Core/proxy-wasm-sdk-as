@@ -38,6 +38,13 @@ static_resources:
                         - match: { prefix: "/" }
                           route: { cluster: svc_trendyol }
                 http_filters:
+                  # Buffer filter to enable request/response body and limit its size
+                  - name: envoy.filters.http.buffer
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.buffer.v3.Buffer
+                      max_request_bytes: 65536 # Set max request body size to 64 KB
+
+                  # This filter is used to run the WebAssembly module
                   - name: envoy.filters.http.wasm
                     typed_config:
                       "@type": type.googleapis.com/udpa.type.v1.TypedStruct
@@ -51,14 +58,15 @@ static_resources:
                             runtime: "envoy.wasm.runtime.v8"
                             code:
                               local:
-                                filename: "build/release.wasm"
+                                filename: "<name-and-path-to-your-binary>.wasm"
                             allow_precompiled: false
                             environment_variables:
                               key_values:
                                 {
-                                  env_variable_name: "env_variable_value",
-                                  another_env_variable_name: "another_env_variable_value",
+                                  secret: "a-string-secret-at-least-256-bits-long",
                                 }
+
+                  # Router filter
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
