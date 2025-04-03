@@ -256,8 +256,12 @@ export function get_current_time_nanoseconds(): u64 {
 
 export function get_property(path: string): ArrayBuffer {
   let buffer = String.UTF8.encode(path);
-  CHECK_RESULT(imports.proxy_get_property(changetype<usize>(buffer), buffer.byteLength, globalArrayBufferReference.bufferPtr(), globalArrayBufferReference.sizePtr()));
-  return globalArrayBufferReference.toArrayBuffer();
+  const result = imports.proxy_get_property(changetype<usize>(buffer), buffer.byteLength, globalArrayBufferReference.bufferPtr(), globalArrayBufferReference.sizePtr());
+  CHECK_RESULT(result);
+  if (result == WasmResultValues.Ok) {
+    return globalArrayBufferReference.toArrayBuffer();
+  }
+  return new ArrayBuffer(0); // result == WasmResultValues.NotFound
 }
 
 export function set_property(path: string, data: ArrayBuffer): WasmResultValues {
@@ -625,6 +629,12 @@ export function get_buffer_bytes(typ: BufferTypeValues, start: u32, length: u32)
     return globalArrayBufferReference.toArrayBuffer()
   }
   return new ArrayBuffer(0);
+}
+
+export function set_buffer_bytes(typ: BufferTypeValues, start: u32, length: u32, value: ArrayBuffer): WasmResultValues {
+  const result = imports.proxy_set_buffer_bytes(typ, start, length, changetype<usize>(value), value.byteLength);
+	wasiLog(LogLevelValues.info, 'Farq: setBuffer result: ' + result.toString());
+  return result
 }
 
 // returning tuples is not supported.
@@ -1117,3 +1127,5 @@ export function registerRootContext(
   name: string): void {
   root_context_factory = context_factory;
 }
+
+

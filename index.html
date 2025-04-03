@@ -1,180 +1,359 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <title>Test proxy abi - AssemblyScript</title>
-  <link rel="icon" href="https://assemblyscript.org/favicon.ico" type="image/x-icon" />
-  <meta name="viewport" content="user-scalable=0" />
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-      color: #111;
-      background: #fff;
-      font-family: sans-serif;
-    }
-
-    body {
-      border-top: 2px solid #bc18d4;
-    }
-
-    h1 {
-      padding: 18px 20px 20px;
-      font-size: 12pt;
-      margin: 0;
-    }
-
-    a {
-      color: #111;
-      text-decoration: none;
-    }
-
-    a:hover {
-      color: #bc18d4;
-      text-decoration: underline;
-    }
-
-    #edge {
-      position: absolute;
-      bottom: 40px;
-      right: 40px;
-      color: #fff;
-      display: none;
-      text-shadow: 0 1px 2px #000;
-      -ms-user-select: none;
-      user-select: none;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>
-    Test wasm filters in the browser!
-  </h1>
-  <input type="text" id="rootid" placeholder="root id" />
-  <textarea id="filterconfig"></textarea>
-  <input type="text" id="result" placeholder="result" />
-
-  <script>"use strict";
-
-    const byteSize = 100000;
-    var globalExports;
-
-    function copystr(value, value_ptr_ptr, value_size_ptr) { 
-      // we only support one property now, the root id.
-      const value_size = value.length;
-      let bytes = globalExports.malloc(value_size);
-      if (bytes === 0) {
-        throw "can't allocate";
+  <head>
+    <title>Test proxy abi - AssemblyScript</title>
+    <link
+      rel="icon"
+      href="https://assemblyscript.org/favicon.ico"
+      type="image/x-icon"
+    />
+    <meta name="viewport" content="user-scalable=0" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        color: #111;
+        background: #fff;
+        font-family: sans-serif;
       }
 
-      var moduleMemory = globalExports.memory.buffer;
-
-      var confMem = new Uint8Array(moduleMemory, bytes, value_size);
-      for(let i = 0; i < value_size; i++){
-        confMem[i]=value.charCodeAt(i);
+      body {
+        border-top: 2px solid #bc18d4;
       }
 
-      var confPtr = new Uint32Array(moduleMemory, value_ptr_ptr, 1);
-      confPtr[0] = bytes;
-      var confSizePtr = new Uint32Array(moduleMemory, value_size_ptr, 1);
-      confSizePtr[0] = value_size;
-
-      console.info("copystr wrote: " +confPtr[0]+ ":" +confSizePtr[0] + " to "+value_ptr_ptr + ":" + value_size_ptr);
-
-    }
-    // Compute the size of and instantiate the module's memory
-    var memory = new WebAssembly.Memory({ initial: ((byteSize + 0xffff) & ~0xffff) >>> 16 });
-    const utf8Decoder = new TextDecoder('utf-8');
-    const filter_config = "fffff";
-    async function initModule(root_id_string, config) {
-      try {
-        // Fetch and instantiate the module
-        // instantiateStreaming so that source map is fetched automatically.
-        const wasmmodule = await WebAssembly.instantiateStreaming(fetch("/build/untouched.wasm"), {
-          env: {
-            memory,
-            abort(_msg, _file, line, column) {
-              console.error("abort called at index.ts:" + line + ":" + column);
-              throw new Error("proc exit");
-            },
-            proxy_log(level, logMessage, messageSize) {
-              var mem = new Uint8Array(globalExports.memory.buffer);
-              let buf = mem.slice(logMessage, logMessage + messageSize);
-              let msg = String.fromCharCode.apply(null, buf);
-              msg = utf8Decoder.decode(buf);
-              console.info(msg.toString());
-              return 0;
-            },
-            proxy_get_configuration(configuration_ptr, configuration_size) {
-              // get memory:
-              copystr(config, configuration_ptr, configuration_size);
-              console.info("configuration_ptr index.ts:" + configuration_ptr + ":" + configuration_size);
-            },
-            proxy_get_status(status_code_ptr, message_ptr, message_size) { return 0; },
-            proxy_set_tick_period_milliseconds(millisecond) { return 0; },
-            proxy_get_current_time_nanoseconds(nanoseconds) { return 0; },
-            proxy_get_property(path_ptr, path_size, value_ptr_ptr, value_size_ptr) { 
-              // we only support one property now, the root id.
-              const prop = root_id_string;
-              copystr(prop, value_ptr_ptr, value_size_ptr);
-              console.info("proxy_get_property index.ts:" + value_ptr_ptr + ":" + value_size_ptr);
-
-              return 0;
-            },
-            proxy_set_property(path_ptr, path_size, value_ptr, value_size) { return 0; },
-            proxy_continue_request() { return 0; },
-            proxy_continue_response() { return 0; },
-            proxy_send_local_response(response_code, response_code_details_ptr,
-              response_code_details_size, body_ptr, body_size,
-              additional_response_header_pairs_ptr,
-              additional_response_header_pairs_size, grpc_status) { return 0; },
-            proxy_clear_route_cache() { return 0; },
-            proxy_get_shared_data(key_ptr, key_size, value_ptr, value_size, cas) { return 0; },
-            proxy_set_shared_data(key_ptr, key_size, value_ptr, value_size, cas) { return 0; },
-            proxy_register_shared_queue(queue_name_ptr, queue_name_size, token) { return 0; },
-            proxy_resolve_shared_queue(vm_id, vm_id_size, queue_name_ptr, queue_name_size, token) { return 0; },
-            proxy_dequeue_shared_queue(token, data_ptr, data_size) { return 0; },
-            proxy_enqueue_shared_queue(token, data_ptr, data_size) { return 0; },
-            proxy_add_header_map_value(typ, key_ptr, key_size, value_ptr, value_size) { return 0; },
-            proxy_get_header_map_value(typ, key_ptr, key_size, value_ptr, value_size) { return 0; },
-            proxy_get_header_map_pairs(typ, ptr, size) { return 0; },
-            proxy_set_header_map_pairs(typ, ptr, size) { return 0; },
-            proxy_replace_header_map_value(typ, key_ptr, key_size, value_ptr, value_size) { return 0; },
-            proxy_remove_header_map_value(typ, key_ptr, key_size) { return 0; },
-            proxy_get_header_map_size(typ, size) { return 0; },
-            proxy_get_buffer_bytes(typ, start, length, ptr, size) { return 0; },
-            proxy_get_buffer_status(typ, length_ptr, flags_ptr) { return 0; },
-            proxy_http_call(uri_ptr, uri_size, header_pairs_ptr, header_pairs_size, body_ptr, body_size, trailer_pairs_ptr, trailer_pairs_size, timeout_milliseconds, token_ptr) { return 0; },
-            proxy_grpc_call(service_ptr, service_size, service_name_ptr, service_name_size, method_name_ptr, method_name_size, request_ptr, request_size, timeout_milliseconds, token_ptr) { return 0; },
-            proxy_grpc_stream(service_ptr, service_size, service_name_ptr, service_name_size, method_name_ptr, method_name_size, token_ptr) { return 0; },
-            proxy_grpc_cancel(token) { return 0; },
-            proxy_grpc_close(token) { return 0; },
-            proxy_grpc_send(token, message_ptr, message_size, end_stream) { return 0; },
-            proxy_define_metric(type, name_ptr, name_size, metric_id) { return 0; },
-            proxy_increment_metric(metric_id, offset) { return 0; },
-            proxy_record_metric(metric_id, value) { return 0; },
-            proxy_get_metric(metric_id, result) { return 0; },
-            proxy_set_effective_context(effective_context_id) { return 0; },
-            proxy_done() { return 0; },
-
-          }
-        });
-        return wasmmodule;
-
-      } catch (err) {
-        alert("Failed to load WASM: " + err.message + " (ad blocker, maybe?)");
-        console.log(err);
-        console.log(err.stack);
+      h1 {
+        padding: 18px 20px 20px;
+        font-size: 12pt;
+        margin: 0;
       }
 
-    } //main
+      a {
+        color: #111;
+        text-decoration: none;
+      }
 
+      a:hover {
+        color: #bc18d4;
+        text-decoration: underline;
+      }
 
-    async function run(root_id_string, config){
-      const wasmmodule = await initModule(root_id_string, config);
+      #edge {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        color: #fff;
+        display: none;
+        text-shadow: 0 1px 2px #000;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Test wasm filters in the browser!</h1>
+    <input type="text" id="rootid" placeholder="root id" />
+    <textarea id="filterconfig"></textarea>
+    <input type="text" id="result" placeholder="result" />
+
+    <script>
+      "use strict";
+
+      const byteSize = 100000;
+      var globalExports;
+
+      function copystr(value, value_ptr_ptr, value_size_ptr) {
+        // we only support one property now, the root id.
+        const value_size = value.length;
+        let bytes = globalExports.malloc(value_size);
+        if (bytes === 0) {
+          throw "can't allocate";
+        }
+
+        var moduleMemory = globalExports.memory.buffer;
+
+        var confMem = new Uint8Array(moduleMemory, bytes, value_size);
+        for (let i = 0; i < value_size; i++) {
+          confMem[i] = value.charCodeAt(i);
+        }
+
+        var confPtr = new Uint32Array(moduleMemory, value_ptr_ptr, 1);
+        confPtr[0] = bytes;
+        var confSizePtr = new Uint32Array(moduleMemory, value_size_ptr, 1);
+        confSizePtr[0] = value_size;
+
+        console.info(
+          "copystr wrote: " +
+            confPtr[0] +
+            ":" +
+            confSizePtr[0] +
+            " to " +
+            value_ptr_ptr +
+            ":" +
+            value_size_ptr
+        );
+      }
+      // Compute the size of and instantiate the module's memory
+      var memory = new WebAssembly.Memory({
+        initial: ((byteSize + 0xffff) & ~0xffff) >>> 16,
+      });
+      const utf8Decoder = new TextDecoder("utf-8");
+      const filter_config = "fffff";
+      async function initModule(root_id_string, config) {
+        try {
+          // Fetch and instantiate the module
+          // instantiateStreaming so that source map is fetched automatically.
+          const wasmmodule = await WebAssembly.instantiateStreaming(
+            fetch("/build/untouched.wasm"),
+            {
+              env: {
+                memory,
+                abort(_msg, _file, line, column) {
+                  console.error(
+                    "abort called at index.ts:" + line + ":" + column
+                  );
+                  throw new Error("proc exit");
+                },
+                proxy_log(level, logMessage, messageSize) {
+                  var mem = new Uint8Array(globalExports.memory.buffer);
+                  let buf = mem.slice(logMessage, logMessage + messageSize);
+                  let msg = String.fromCharCode.apply(null, buf);
+                  msg = utf8Decoder.decode(buf);
+                  console.info(msg.toString());
+                  return 0;
+                },
+                proxy_get_configuration(configuration_ptr, configuration_size) {
+                  // get memory:
+                  copystr(config, configuration_ptr, configuration_size);
+                  console.info(
+                    "configuration_ptr index.ts:" +
+                      configuration_ptr +
+                      ":" +
+                      configuration_size
+                  );
+                },
+                proxy_get_status(status_code_ptr, message_ptr, message_size) {
+                  return 0;
+                },
+                proxy_set_tick_period_milliseconds(millisecond) {
+                  return 0;
+                },
+                proxy_get_current_time_nanoseconds(nanoseconds) {
+                  return 0;
+                },
+                proxy_get_property(
+                  path_ptr,
+                  path_size,
+                  value_ptr_ptr,
+                  value_size_ptr
+                ) {
+                  // we only support one property now, the root id.
+                  const prop = root_id_string;
+                  copystr(prop, value_ptr_ptr, value_size_ptr);
+                  console.info(
+                    "proxy_get_property index.ts:" +
+                      value_ptr_ptr +
+                      ":" +
+                      value_size_ptr
+                  );
+
+                  return 0;
+                },
+                proxy_set_property(path_ptr, path_size, value_ptr, value_size) {
+                  return 0;
+                },
+                proxy_continue_request() {
+                  return 0;
+                },
+                proxy_continue_response() {
+                  return 0;
+                },
+                proxy_send_local_response(
+                  response_code,
+                  response_code_details_ptr,
+                  response_code_details_size,
+                  body_ptr,
+                  body_size,
+                  additional_response_header_pairs_ptr,
+                  additional_response_header_pairs_size,
+                  grpc_status
+                ) {
+                  return 0;
+                },
+                proxy_clear_route_cache() {
+                  return 0;
+                },
+                proxy_get_shared_data(
+                  key_ptr,
+                  key_size,
+                  value_ptr,
+                  value_size,
+                  cas
+                ) {
+                  return 0;
+                },
+                proxy_set_shared_data(
+                  key_ptr,
+                  key_size,
+                  value_ptr,
+                  value_size,
+                  cas
+                ) {
+                  return 0;
+                },
+                proxy_register_shared_queue(
+                  queue_name_ptr,
+                  queue_name_size,
+                  token
+                ) {
+                  return 0;
+                },
+                proxy_resolve_shared_queue(
+                  vm_id,
+                  vm_id_size,
+                  queue_name_ptr,
+                  queue_name_size,
+                  token
+                ) {
+                  return 0;
+                },
+                proxy_dequeue_shared_queue(token, data_ptr, data_size) {
+                  return 0;
+                },
+                proxy_enqueue_shared_queue(token, data_ptr, data_size) {
+                  return 0;
+                },
+                proxy_add_header_map_value(
+                  typ,
+                  key_ptr,
+                  key_size,
+                  value_ptr,
+                  value_size
+                ) {
+                  return 0;
+                },
+                proxy_get_header_map_value(
+                  typ,
+                  key_ptr,
+                  key_size,
+                  value_ptr,
+                  value_size
+                ) {
+                  return 0;
+                },
+                proxy_get_header_map_pairs(typ, ptr, size) {
+                  return 0;
+                },
+                proxy_set_header_map_pairs(typ, ptr, size) {
+                  return 0;
+                },
+                proxy_replace_header_map_value(
+                  typ,
+                  key_ptr,
+                  key_size,
+                  value_ptr,
+                  value_size
+                ) {
+                  return 0;
+                },
+                proxy_remove_header_map_value(typ, key_ptr, key_size) {
+                  return 0;
+                },
+                proxy_get_header_map_size(typ, size) {
+                  return 0;
+                },
+                proxy_get_buffer_bytes(typ, start, length, ptr, size) {
+                  return 0;
+                },
+                proxy_get_buffer_status(typ, length_ptr, flags_ptr) {
+                  return 0;
+                },
+                proxy_set_buffer_bytes(typ, start, length, ptr, size) {
+                  return 0;
+                },
+                proxy_http_call(
+                  uri_ptr,
+                  uri_size,
+                  header_pairs_ptr,
+                  header_pairs_size,
+                  body_ptr,
+                  body_size,
+                  trailer_pairs_ptr,
+                  trailer_pairs_size,
+                  timeout_milliseconds,
+                  token_ptr
+                ) {
+                  return 0;
+                },
+                proxy_grpc_call(
+                  service_ptr,
+                  service_size,
+                  service_name_ptr,
+                  service_name_size,
+                  method_name_ptr,
+                  method_name_size,
+                  request_ptr,
+                  request_size,
+                  timeout_milliseconds,
+                  token_ptr
+                ) {
+                  return 0;
+                },
+                proxy_grpc_stream(
+                  service_ptr,
+                  service_size,
+                  service_name_ptr,
+                  service_name_size,
+                  method_name_ptr,
+                  method_name_size,
+                  token_ptr
+                ) {
+                  return 0;
+                },
+                proxy_grpc_cancel(token) {
+                  return 0;
+                },
+                proxy_grpc_close(token) {
+                  return 0;
+                },
+                proxy_grpc_send(token, message_ptr, message_size, end_stream) {
+                  return 0;
+                },
+                proxy_define_metric(type, name_ptr, name_size, metric_id) {
+                  return 0;
+                },
+                proxy_increment_metric(metric_id, offset) {
+                  return 0;
+                },
+                proxy_record_metric(metric_id, value) {
+                  return 0;
+                },
+                proxy_get_metric(metric_id, result) {
+                  return 0;
+                },
+                proxy_set_effective_context(effective_context_id) {
+                  return 0;
+                },
+                proxy_done() {
+                  return 0;
+                },
+              },
+            }
+          );
+          return wasmmodule;
+        } catch (err) {
+          alert(
+            "Failed to load WASM: " + err.message + " (ad blocker, maybe?)"
+          );
+          console.log(err);
+          console.log(err.stack);
+        }
+      } //main
+
+      async function run(root_id_string, config) {
+        const wasmmodule = await initModule(root_id_string, config);
         var exports = wasmmodule.instance.exports;
         globalExports = exports;
         var next_context_id = 1;
@@ -183,11 +362,13 @@
         exports.proxy_on_vm_start(root_id, 0);
         // Initialize the filter
         let result = exports.proxy_on_configure(root_id, config.length);
-        document.getElementById("result").value =  result.toString();
-    }
-  </script>
-  <button onclick="run(document.getElementById('rootid').value, document.getElementById('filterconfig').value)">run</button>
-
-</body>
-
+        document.getElementById("result").value = result.toString();
+      }
+    </script>
+    <button
+      onclick="run(document.getElementById('rootid').value, document.getElementById('filterconfig').value)"
+    >
+      run
+    </button>
+  </body>
 </html>

@@ -1,14 +1,18 @@
 import * as imports from "./imports";
 
-import { globalArrayBufferReference, LogLevelValues } from "./runtime";
+import {
+  get_current_time_nanoseconds,
+  globalArrayBufferReference,
+  LogLevelValues,
+} from "./runtime";
 
 let logLevel: LogLevelValues = LogLevelValues.info;
 
-export function setLogLevel(level: LogLevelValues): void {
+function setLogLevel(level: LogLevelValues): void {
   logLevel = level;
 }
 
-export function log(level: LogLevelValues, logMessage: string): void {
+function log(level: LogLevelValues, logMessage: string): void {
   // Temporary fix for proxy_log not being implemented in fastedge:
   // relies on @assemblyscript/wasi-shim to print to standard output
   if (level >= logLevel) {
@@ -16,7 +20,11 @@ export function log(level: LogLevelValues, logMessage: string): void {
   }
 }
 
-export function getEnvVar(key: string): string {
+function getCurrentTime(): u64 {
+  return get_current_time_nanoseconds() / 1_000_000; // Convert nanoseconds to milliseconds
+}
+
+function getEnvVar(key: string): string {
   const hasKey = process.env.has(key);
   if (hasKey) {
     return process.env.get(key);
@@ -24,7 +32,7 @@ export function getEnvVar(key: string): string {
   return "";
 }
 
-export function getSecretVar(key: string): string {
+function getSecretVar(key: string): string {
   const buffer = String.UTF8.encode(key);
   const status = imports.proxy_get_secret(
     changetype<usize>(buffer),
@@ -43,7 +51,7 @@ export function getSecretVar(key: string): string {
   return String.UTF8.decode(arrBuff);
 }
 
-export function getSecretVarEffectiveAt(key: string, at: u32): string {
+function getSecretVarEffectiveAt(key: string, at: u32): string {
   const buffer = String.UTF8.encode(key);
   const status = imports.proxy_get_effective_at_secret(
     changetype<usize>(buffer),
@@ -63,4 +71,12 @@ export function getSecretVarEffectiveAt(key: string, at: u32): string {
   return String.UTF8.decode(arrBuff);
 }
 
-export { LogLevelValues };
+export {
+  getCurrentTime,
+  getEnvVar,
+  getSecretVar,
+  getSecretVarEffectiveAt,
+  log,
+  LogLevelValues,
+  setLogLevel,
+};
