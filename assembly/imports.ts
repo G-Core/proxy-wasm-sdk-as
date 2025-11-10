@@ -201,3 +201,68 @@ export declare function proxy_get_effective_at_secret(
   return_value_size: usize
 ): u32;
 
+
+// KV Store
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_open")
+export declare function proxy_kv_store_open(
+  key_data: usize,
+  key_size: usize,
+  return_handle: u32
+): u32;
+
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_get")
+export declare function proxy_kv_store_get(
+  handle: u32,
+  key_data: usize,
+  key_size: usize,
+  return_value_data: usize,
+  return_value_size: usize,
+): u32;
+
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_scan")
+export declare function proxy_kv_store_scan(
+  handle: u32,
+  pattern_data: usize,
+  pattern_size: usize,
+  return_value_data: usize,
+  return_value_size: usize,
+): u32;
+
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_zrange_by_score")
+export declare function proxy_kv_store_zrange_by_score(
+  handle: u32,
+  key_data: usize,
+  key_size: usize,
+  min: f64,
+  max: f64,
+  return_value_data: usize,
+  return_value_size: usize,
+): u32;
+
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_zscan")
+export declare function proxy_kv_store_zscan(
+  handle: u32,
+  key_data: usize,
+  key_size: usize,
+  pattern_data: usize,
+  pattern_size: usize,
+  return_value_data: usize,
+  return_value_size: usize,
+): u32;
+
+// @ts-ignore: decorator
+@external("env", "proxy_kv_store_bf_exists")
+export declare function proxy_kv_store_bf_exists(
+  handle: u32,
+  key_data: usize,
+  key_size: usize,
+  item_data: usize,
+  item_size: usize,
+  return_handle: u32,
+): u32;
+

@@ -3,6 +3,7 @@ import { free } from "./malloc";
 
 import { log as wasiLog } from "./fastedge";
 
+
 // abort function.
 // use with:
 // --use abort=index/abort_proc_exit
@@ -32,7 +33,6 @@ function CHECK_RESULT(c: imports.WasmResult): void {
 }
 
 /////////////// Access helpers
-
 export class Reference<T> {
   data: T;
 
@@ -55,8 +55,12 @@ class ArrayBufferReference {
     return changetype<usize>(this) + offsetof<ArrayBufferReference>("buffer");
   }
 
-  // Before calling toArrayBuffer below, you must call out to the host to fill in the values.
-  // toArrayBuffer below **must** be called once and only once.
+  /**
+   * Before calling toArrayBuffer below, you must call out to the host to fill in the values.
+   * toArrayBuffer below **must** be called once and only once.
+   * Host code used malloc to allocate this buffer.
+   * This method consumes the buffer and handles memory cleanup automatically.
+   */
   toArrayBuffer(): ArrayBuffer {
     if (this.size == 0) {
       return new ArrayBuffer(0);
@@ -70,6 +74,8 @@ class ArrayBufferReference {
     return array;
   }
 }
+
+
 
 export const globalArrayBufferReference = new ArrayBufferReference();
 let globalU32Ref = new Reference<u32>();
@@ -633,7 +639,6 @@ export function get_buffer_bytes(typ: BufferTypeValues, start: u32, length: u32)
 
 export function set_buffer_bytes(typ: BufferTypeValues, start: u32, length: u32, value: ArrayBuffer): WasmResultValues {
   const result = imports.proxy_set_buffer_bytes(typ, start, length, changetype<usize>(value), value.byteLength);
-	wasiLog(LogLevelValues.info, 'Farq: setBuffer result: ' + result.toString());
   return result
 }
 

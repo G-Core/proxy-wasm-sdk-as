@@ -41,11 +41,3 @@ export {
   stream_context,
   WasmResultValues,
 } from "./runtime";
-
-export {
-  getCurrentTime,
-  getEnvVar,
-  getSecretVar,
-  getSecretVarEffectiveAt,
-  setLogLevel,
-} from "./fastedge";
