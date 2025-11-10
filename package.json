@@ -1,7 +1,7 @@
 {
   "name": "@gcoredev/proxy-wasm-sdk-as",
   "description": "Use this SDK to write extensions for the proxy WASM ABI",
-  "version": "0.0.1",
+  "version": "1.2.0",
   "main": "assembly/index.ts",
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug",
