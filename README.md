@@ -5,6 +5,7 @@
 [![GitHub top language](https://img.shields.io/github/languages/top/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as)
 [![GitHub License](https://img.shields.io/github/license/G-Core/proxy-wasm-sdk-as)](https://github.com/G-Core/proxy-wasm-sdk-as/blob/main/LICENSE)
 [![NPM Version](https://img.shields.io/npm/v/@gcoredev/proxy-wasm-sdk-as)](https://www.npmjs.com/package/@gcoredev/proxy-wasm-sdk-as)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as?ref=badge_shield)
 
 This is a friendly fork of https://github.com/Kong/proxy-wasm-assemblyscript-sdk/,
 mantained to address an incompatibility between the AssemblyScript SDK and the Rust SDK,
@@ -99,3 +100,7 @@ Please see [Envoy.md](./ENVOY.md)
 ## Examples
 
 For more examples on how to use this `proxy-wasm-sdk-as` please see our [examples repo](https://github.com/G-Core/FastEdge-examples/tree/main/assemblyscript)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as?ref=badge_large)
