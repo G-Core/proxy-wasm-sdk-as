@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: ["*.*.x", "*.x", "master", "next", "next-major", "beta", "alpha"]
 
+  workflow_call: # allow this workflow to be called by other workflows
+
 jobs:
   unit_tests:
     runs-on: [self-hosted, ubuntu-22-04, regular]
