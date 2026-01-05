@@ -9,7 +9,7 @@
 This is a friendly fork of https://github.com/Kong/proxy-wasm-assemblyscript-sdk/,
 mantained to address an incompatibility between the AssemblyScript SDK and the Rust SDK,
 
-It also adds some FastEdge specific functionality.
+It also provides FastEdge specific functionality for accessing resources.
 
 ## How to use this SDK
 
