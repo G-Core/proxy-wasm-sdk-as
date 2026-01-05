@@ -15,7 +15,7 @@ on:
 jobs:
   # Gihub Actions do not allow regex validation for numbers in *.*.x branch names
   validate_branch_name:
-    runs-on: ubuntu-latest # Use a standard runner for Trusted Publishing
+    runs-on: [self-hosted, ubuntu-22-04, regular]
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -32,25 +32,7 @@ jobs:
 
   unit_tests:
     needs: [validate_branch_name]
-    runs-on: [self-hosted, ubuntu-22-04, regular]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up repo submodules
-        run: git submodule update --init --recursive
-
-      - name: Setup Node Environment
-        uses: ./.github/setup-node
-
-      - name: Build
-        run: npm run asbuild
-
-      - name: Build and run Auth example
-        run: cd examples/auth && npm install && npm run asbuild
-
-      - name: Build and run Add Header example
-        run: cd examples/addheader && npm install && npm run asbuild
+    uses: ./.github/workflows/pr.yaml
 
   fossa:
     needs: [validate_branch_name]
