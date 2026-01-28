@@ -20,6 +20,16 @@ function setLogLevel(level: LogLevelValues): void {
  */
 function log(level: LogLevelValues, logMessage: string): void {
   if (level >= logLevel) {
+    const logLevelPrefixes: string[] = [
+      "[TRACE]",
+      "[DEBUG]",
+      "[INFO]",
+      "[WARN]",
+      "[ERROR]",
+      "[CRITICAL]",
+    ];
+    const prefix = logLevelPrefixes[level];
+    logMessage = `${prefix}: ${logMessage}`;
     process.stdout.write(logMessage + "\n");
   }
 }
