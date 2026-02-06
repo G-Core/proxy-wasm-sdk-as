@@ -48,4 +48,28 @@ function getSecretEffectiveAt(name: string, effectiveAt: u32): string {
   return "";
 }
 
-export { getSecret, getSecretEffectiveAt };
+/**
+ * @deprecated Use {@link getSecret} instead. This function will be removed in a future version.
+ * @param {string} name - The name of the secret variable.
+ * @returns {string} The value of the secret variable.
+ */
+function getSecretVar(name: string): string {
+  return getSecret(name);
+}
+
+/**
+ * @deprecated Use {@link getSecretEffectiveAt} instead. This function will be removed in a future version.
+ * @param {string} name - The name of the secret variable.
+ * @param {u32} effectiveAt - The slot index of the secret. (effectiveAt >= secret_slots.slot)
+ * @returns {string} The value of the secret variable.
+ */
+function getSecretVarEffectiveAt(name: string, effectiveAt: u32): string {
+  return getSecretEffectiveAt(name, effectiveAt);
+}
+
+export {
+  getSecret,
+  getSecretEffectiveAt,
+  getSecretVar,
+  getSecretVarEffectiveAt,
+};

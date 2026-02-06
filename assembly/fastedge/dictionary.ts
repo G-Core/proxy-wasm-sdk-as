@@ -1,6 +1,7 @@
 import * as imports from "../imports";
 
 import { globalArrayBufferReference, WasmResultValues } from "../runtime";
+
 /**
  * Function to get the value for the provided environment variable name.
  * @param {string} name - The name of the environment variable.
