@@ -1,5 +1,5 @@
 /**
- * Function to get the value for the provided environment variable name.
+ * @deprecated Use {@link getEnv} instead. This function will be removed in a future version.
  * @param {string} name - The name of the environment variable.
  * @returns {string} The value of the environment variable.
  */

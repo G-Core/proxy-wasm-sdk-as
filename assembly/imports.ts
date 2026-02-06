@@ -180,6 +180,16 @@ export declare function proxy_call_foreign_function(function_name: ptr<char>,
 
 // FastEdge HOST Apis
 
+// Dictionary
+// @ts-ignore: decorator
+@external("env", "proxy_dictionary_get")
+export declare function proxy_dictionary_get(
+  key_data: usize,
+  key_size: usize,
+  return_value_data: usize,
+  return_value_size: usize
+): u32;
+
 // Secrets
 // @ts-ignore: decorator
 @external("env", "proxy_get_secret")
