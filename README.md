@@ -66,7 +66,7 @@ class AddHeader extends Context {
     } else {
       stream_context.headers.response.add(
         "hello",
-        root_context.getConfiguration()
+        root_context.getConfiguration(),
       );
     }
     return FilterHeadersStatusValues.Continue;
@@ -99,8 +99,26 @@ Please see [Envoy.md](./ENVOY.md)
 
 ## Examples
 
-For more examples on how to use this `proxy-wasm-sdk-as` please see our [examples repo](https://github.com/G-Core/FastEdge-examples/tree/main/assemblyscript)
+The `examples/` directory contains standalone examples demonstrating common use cases. Each example has its own `package.json`, `asconfig.json`, and `README.md`.
 
-## License
+To build any example:
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FG-Core%2Fproxy-wasm-sdk-as?ref=badge_large)
+```sh
+cd examples/<name>
+pnpm install
+pnpm run asbuild
+```
+
+The compiled binary (`build/<name>.wasm`) can then be uploaded to the [FastEdge portal](https://portal.gcore.com).
+
+| Example                                                | Description                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------------------ |
+| [body](./examples/body)                                | Read and modify request and response bodies                        |
+| [geoBlock](./examples/geoBlock)                        | Block requests from specific countries using a `BLACKLIST` env var |
+| [geoRedirect](./examples/geoRedirect)                  | Route requests to different origins based on country code          |
+| [headers](./examples/headers)                          | Add, remove, and replace HTTP request and response headers         |
+| [jwt](./examples/jwt)                                  | Validate a JWT Bearer token using a secret variable                |
+| [kvStore](./examples/kvStore)                          | Query a FastEdge KV Store (get, scan, zrange, zscan, bfExists)     |
+| [logTime](./examples/logTime)                          | Log UTC timestamps at the request and response phases              |
+| [properties](./examples/properties)                    | Read and expose FastEdge runtime properties as response headers    |
+| [variablesAndSecrets](./examples/variablesAndSecrets/) | Access FastEdge environment varibales and secrets at runtime       |

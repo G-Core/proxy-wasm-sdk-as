@@ -1,0 +1,17 @@
+{
+  "name": "fastedge-as-example-geoblock",
+  "version": "1.0.0",
+  "description": "FastEdge AssemblyScript example: Geo Block",
+  "scripts": {
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
+  },
+  "dependencies": {
+    "@gcoredev/proxy-wasm-sdk-as": "file:../.."
+  },
+  "devDependencies": {
+    "@assemblyscript/wasi-shim": "^0.1.0",
+    "assemblyscript": "^0.28.9"
+  }
+}

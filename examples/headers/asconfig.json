@@ -1,0 +1,24 @@
+{
+  "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json",
+  "targets": {
+    "debug": {
+      "outFile": "build/headers-debug.wasm",
+      "textFile": "build/headers-debug.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "build/headers.wasm",
+      "textFile": "build/headers.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "bindings": "esm",
+    "use": "abort=abort_proc_exit"
+  }
+}

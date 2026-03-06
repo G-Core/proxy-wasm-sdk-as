@@ -1,0 +1,19 @@
+{
+  "name": "fastedge-as-example-jwt",
+  "version": "1.0.0",
+  "description": "FastEdge AssemblyScript example: JWT validation",
+  "scripts": {
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
+  },
+  "dependencies": {
+    "@gcoredev/as-jwt": "^1.0.3",
+    "@gcoredev/proxy-wasm-sdk-as": "file:../..",
+    "assemblyscript-json": "^1.1.0"
+  },
+  "devDependencies": {
+    "@assemblyscript/wasi-shim": "^0.1.0",
+    "assemblyscript": "^0.28.9"
+  }
+}
