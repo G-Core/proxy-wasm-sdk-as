@@ -1,0 +1,73 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@gcoredev/as-jwt':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@gcoredev/proxy-wasm-sdk-as':
+        specifier: file:../..
+        version: file:../..
+      assemblyscript-json:
+        specifier: ^1.1.0
+        version: 1.1.0
+    devDependencies:
+      '@assemblyscript/wasi-shim':
+        specifier: ^0.1.0
+        version: 0.1.0
+      assemblyscript:
+        specifier: ^0.28.9
+        version: 0.28.9
+
+packages:
+
+  '@assemblyscript/wasi-shim@0.1.0':
+    resolution: {integrity: sha512-fSLH7MdJHf2uDW5llA5VCF/CG62Jp2WkYGui9/3vIWs3jDhViGeQF7nMYLUjpigluM5fnq61I6obtCETy39FZw==}
+
+  '@gcoredev/as-jwt@1.0.3':
+    resolution: {integrity: sha512-A0/1T+Z7+ezCo+w7/YD/RMeR3ZsYw1IHICnzQ8Qnr23SJa5bmLKkdK8QEUZ5Lvrnh7JQIPPrTjCJq7ks6ZSzaQ==}
+
+  '@gcoredev/proxy-wasm-sdk-as@file:../..':
+    resolution: {directory: ../.., type: directory}
+
+  assemblyscript-json@1.1.0:
+    resolution: {integrity: sha512-UbE8ts8csTWQgd5TnSPN7MRV9NveuHv1bVnKmDLoo/tzjqxkmsZb3lu59Uk8H7SGoqdkDSEE049alx/nHnSdFw==}
+
+  assemblyscript@0.28.9:
+    resolution: {integrity: sha512-UQqIYSUuJzqQP6fKTs1CtanyxmnDk7K+Kmj/J67agimxDqxjdMnTF/y9rEHUBL+K/VIEV4QYu57RMrL5LwbAvw==}
+    engines: {node: '>=20', npm: '>=10'}
+    hasBin: true
+
+  binaryen@123.0.0-nightly.20250530:
+    resolution: {integrity: sha512-d1zPHBN5YlOd3Ff+OUxvVExuFeh8heSnqe+X3bjItFxGLvn4VGBKmrvv7pgy/cRhrIUGuPW138iaWfDhwjyDqg==}
+    hasBin: true
+
+  long@5.3.2:
+    resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
+
+snapshots:
+
+  '@assemblyscript/wasi-shim@0.1.0': {}
+
+  '@gcoredev/as-jwt@1.0.3':
+    dependencies:
+      assemblyscript-json: 1.1.0
+
+  '@gcoredev/proxy-wasm-sdk-as@file:../..': {}
+
+  assemblyscript-json@1.1.0: {}
+
+  assemblyscript@0.28.9:
+    dependencies:
+      binaryen: 123.0.0-nightly.20250530
+      long: 5.3.2
+
+  binaryen@123.0.0-nightly.20250530: {}
+
+  long@5.3.2: {}
