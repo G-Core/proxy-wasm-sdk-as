@@ -397,12 +397,8 @@ The global `stream_context` variable provides access to request and response hea
 declare var stream_context: {
   headers: {
     request:       HeaderStreamManipulator; // request headers
-    response:      HeaderStreamManipulator; // response headers
+    response:      HeaderStreamManipulator; // response headers (response-phase hooks only)
     http_callback: HeaderStreamManipulator; // outbound HTTP call response headers
-  };
-  trailers: {
-    request:  HeaderStreamManipulator; // request trailers
-    response: HeaderStreamManipulator; // response trailers
   };
 };
 ```
@@ -687,15 +683,15 @@ class RootContext {
 
 **Parameters:**
 
-| Parameter              | Type                                                                                    | Description                                                                                                              |
-| ---------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `cluster`              | `string`                                                                                | The upstream host to call. Must be a public host.                                                                        |
-| `headers`              | `Headers`                                                                               | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
-| `body`                 | `ArrayBuffer`                                                                           | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
-| `trailers`             | `Headers`                                                                               | Request trailers. Pass `[]` if none.                                                                                     |
-| `timeout_milliseconds` | `u32`                                                                                   | Request timeout in milliseconds.                                                                                         |
-| `origin_context`       | `BaseContext`                                                                           | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
-| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void`  | Callback invoked when the response is received.                                                                          |
+| Parameter              | Type                                                                                   | Description                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster`              | `string`                                                                               | The upstream host to call. Must be a public host.                                                                        |
+| `headers`              | `Headers`                                                                              | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
+| `body`                 | `ArrayBuffer`                                                                          | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
+| `trailers`             | `Headers`                                                                              | Request trailers. Pass `[]` if none.                                                                                     |
+| `timeout_milliseconds` | `u32`                                                                                  | Request timeout in milliseconds.                                                                                         |
+| `origin_context`       | `BaseContext`                                                                          | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
+| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void` | Callback invoked when the response is received.                                                                          |
 
 In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`.
 

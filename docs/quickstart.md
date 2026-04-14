@@ -31,9 +31,9 @@ Add build scripts to your `package.json`:
 ```json
 {
   "scripts": {
-    "asbuild:debug":   "asc assembly/index.ts --target debug",
+    "asbuild:debug": "asc assembly/index.ts --target debug",
     "asbuild:release": "asc assembly/index.ts --target release",
-    "asbuild":         "npm run asbuild:debug && npm run asbuild:release"
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release"
   }
 }
 ```
@@ -53,7 +53,7 @@ my-cdn-app/
 Create `assembly/index.ts`. Every CDN app must re-export the proxy entry points and register a root context:
 
 ```typescript
-export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy";
+export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy"; // this exports the required functions for the proxy to interact with us.
 
 import {
   Context,
@@ -113,19 +113,20 @@ registerRootContext((context_id: u32) => {
 
 ### What each part does
 
-| Part                                  | Purpose                                                                            |
-| ------------------------------------- | ---------------------------------------------------------------------------------- |
-| `export * from ".../assembly/proxy"`  | Exposes the wasm entry points the host runtime calls into. Required in every app.  |
-| `RootContext` subclass                | Created once per worker; `createContext` produces a `Context` per HTTP connection. |
-| `Context` subclass                    | Handles per-request lifecycle hooks.                                               |
-| `registerRootContext`                 | Registers your root context factory with the proxy runtime.                        |
+| Part                                 | Purpose                                                                                                     |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `export * from ".../assembly/proxy"` | Exposes the wasm entry points the host runtime calls into. Required in every app.                           |
+| `RootContext` subclass               | Created once per worker; `createContext` produces a `Context` for each hook invocation.                     |
+| `Context` subclass                   | Handles a single lifecycle hook. A fresh instance is created for each hook phase,                           |
+|                                      | instance fields do not persist across hooks. See [Hook State Isolation](./SDK_API.md#hook-state-isolation). |
+| `registerRootContext`                | Registers your root context factory with the proxy runtime.                                                 |
 
 ### Lifecycle hooks
 
 Override any of these methods on your `Context` subclass to intercept traffic:
 
-| Method                                                                                    | Called when                          |
-| ----------------------------------------------------------------------------------------- | ------------------------------------ |
+| Method                                                                                   | Called when                          |
+| ---------------------------------------------------------------------------------------- | ------------------------------------ |
 | `onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues`         | Inbound request headers arrive       |
 | `onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`  | Inbound request body chunk arrives   |
 | `onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues`              | Outbound response headers arrive     |
@@ -140,8 +141,8 @@ Use `log` from the SDK. `console.log` is not available in the WebAssembly enviro
 ```typescript
 import { log, LogLevelValues } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 
-log(LogLevelValues.info,  "request received");
-log(LogLevelValues.warn,  "unexpected header value");
+log(LogLevelValues.info, "request received");
+log(LogLevelValues.warn, "unexpected header value");
 log(LogLevelValues.error, "aborting request");
 log(LogLevelValues.debug, "header count: " + headers.toString());
 ```
@@ -150,13 +151,19 @@ Log output is routed through the proxy-wasm host to stdout.
 
 ### Error handling
 
-AssemblyScript does not support `try/catch` in most contexts. Use null checks and return values:
+AssemblyScript does not support `try/catch` in most contexts. Check return values instead. `getEnv` returns an empty string when the variable is not set:
 
 ```typescript
+import {
+  FilterHeadersStatusValues,
+  log,
+  LogLevelValues,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly";
 import { getEnv } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
+// inside a Context hook, e.g. onRequestHeaders
 const value = getEnv("MY_VAR");
-if (value === null) {
+if (!value) {
   log(LogLevelValues.warn, "MY_VAR not set");
   return FilterHeadersStatusValues.Continue;
 }
@@ -195,13 +202,13 @@ Create `asconfig.json` in your project root:
 
 ### Configuration fields
 
-| Field                                   | Required | Description                                                                                    |
-| --------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `extends` (wasi-shim)                   | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
-| `options.use: "abort=abort_proc_exit"`  | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps. |
-| `options.bindings: "esm"`               | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
-| `targets.release.outFile`               | Yes      | Path for the compiled release wasm binary.                                                     |
-| `targets.debug.outFile`                 | Yes      | Path for the debug wasm binary.                                                                |
+| Field                                  | Required | Description                                                                                    |
+| -------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `extends` (wasi-shim)                  | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
+| `options.use: "abort=abort_proc_exit"` | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps.  |
+| `options.bindings: "esm"`              | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
+| `targets.release.outFile`              | Yes      | Path for the compiled release wasm binary.                                                     |
+| `targets.debug.outFile`                | Yes      | Path for the debug wasm binary.                                                                |
 
 The `"use": "abort=abort_proc_exit"` option is mandatory. Without it, unhandled aborts in AssemblyScript will not terminate the wasm module correctly on the FastEdge host.
 
