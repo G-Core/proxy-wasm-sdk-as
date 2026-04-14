@@ -7,19 +7,12 @@
     "asbuild:debug": "asc assembly/index.ts --target debug",
     "asbuild:release": "asc assembly/index.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
-    "server": "ws --log.format dev",
-    "docs": "typedoc"
+    "generate:docs": "./fastedge-plugin-source/generate-docs.sh"
   },
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",
     "@semantic-release/changelog": "^6.0.3",
-    "assemblyscript": "^0.28.9",
-    "http-server": "^14.1.1",
-    "local-web-server": "^5.4.0",
-    "typedoc": "^0.28.16"
-  },
-  "directories": {
-    "doc": "docs"
+    "assemblyscript": "^0.28.9"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://fastedge-plugin-source/manifest/v1",
+  "repo_id": "proxy-wasm-sdk-as",
+  "version": "1.0.0",
+  "sources": {
+    "sdk-api": {
+      "files": ["docs/SDK_API.md"],
+      "required": true,
+      "description": "Complete SDK API — proxy-wasm lifecycle, RootContext/Context, lifecycle hooks, enums, stream_context, FastEdge host APIs (dictionary, secrets, KV store, utils)"
+    },
+
+    "cdn-hello-world-blueprint": {
+      "files": [
+        "examples/helloWorld/assembly/index.ts",
+        "examples/helloWorld/package.json",
+        "examples/helloWorld/asconfig.json"
+      ],
+      "required": true,
+      "description": "CDN Hello World example — base skeleton blueprint extraction (CDN AssemblyScript)"
+    },
+
+    "cdn-body-blueprint": {
+      "files": [
+        "examples/body/assembly/index.ts",
+        "examples/body/package.json",
+        "examples/body/README.md"
+      ],
+      "required": true,
+      "description": "CDN Body manipulation example — scaffold blueprint extraction"
+    },
+    "cdn-body-pattern": {
+      "files": [
+        "examples/body/assembly/index.ts",
+        "examples/body/package.json",
+        "examples/body/README.md"
+      ],
+      "required": true,
+      "description": "CDN Body manipulation example — docs pattern extraction"
+    },
+
+    "cdn-geoblock-blueprint": {
+      "files": [
+        "examples/geoBlock/assembly/index.ts",
+        "examples/geoBlock/package.json",
+        "examples/geoBlock/README.md"
+      ],
+      "required": true,
+      "description": "CDN GeoBlock example — scaffold blueprint extraction"
+    },
+    "cdn-geoblock-pattern": {
+      "files": [
+        "examples/geoBlock/assembly/index.ts",
+        "examples/geoBlock/package.json",
+        "examples/geoBlock/README.md"
+      ],
+      "required": true,
+      "description": "CDN GeoBlock example — docs pattern extraction"
+    },
+
+    "cdn-headers-blueprint": {
+      "files": [
+        "examples/headers/assembly/index.ts",
+        "examples/headers/package.json",
+        "examples/headers/README.md"
+      ],
+      "required": true,
+      "description": "CDN Headers manipulation example — scaffold blueprint extraction"
+    },
+    "cdn-headers-pattern": {
+      "files": [
+        "examples/headers/assembly/index.ts",
+        "examples/headers/package.json",
+        "examples/headers/README.md"
+      ],
+      "required": true,
+      "description": "CDN Headers manipulation example — docs pattern extraction"
+    },
+
+    "cdn-jwt-blueprint": {
+      "files": [
+        "examples/jwt/assembly/index.ts",
+        "examples/jwt/package.json",
+        "examples/jwt/README.md"
+      ],
+      "required": true,
+      "description": "CDN JWT Auth example — scaffold blueprint extraction"
+    },
+    "cdn-jwt-pattern": {
+      "files": [
+        "examples/jwt/assembly/index.ts",
+        "examples/jwt/package.json",
+        "examples/jwt/README.md"
+      ],
+      "required": true,
+      "description": "CDN JWT Auth example — docs pattern extraction"
+    },
+
+    "cdn-kvstore-blueprint": {
+      "files": [
+        "examples/kvStore/assembly/index.ts",
+        "examples/kvStore/assembly/utils.ts",
+        "examples/kvStore/package.json",
+        "examples/kvStore/README.md"
+      ],
+      "required": true,
+      "description": "CDN KV Store example — scaffold blueprint extraction"
+    },
+    "cdn-kvstore-pattern": {
+      "files": [
+        "examples/kvStore/assembly/index.ts",
+        "examples/kvStore/assembly/utils.ts",
+        "examples/kvStore/package.json",
+        "examples/kvStore/README.md"
+      ],
+      "required": true,
+      "description": "CDN KV Store example — docs pattern extraction"
+    },
+
+    "cdn-georedirect-pattern": {
+      "files": [
+        "examples/geoRedirect/assembly/index.ts",
+        "examples/geoRedirect/package.json",
+        "examples/geoRedirect/README.md"
+      ],
+      "required": false,
+      "description": "CDN GeoRedirect example — docs pattern extraction (reference only)"
+    },
+
+    "cdn-properties-pattern": {
+      "files": [
+        "examples/properties/assembly/index.ts",
+        "examples/properties/package.json",
+        "examples/properties/README.md"
+      ],
+      "required": false,
+      "description": "CDN Properties example — docs pattern extraction (reference only)"
+    },
+
+    "cdn-env-secrets-pattern": {
+      "files": [
+        "examples/variablesAndSecrets/assembly/index.ts",
+        "examples/variablesAndSecrets/package.json"
+      ],
+      "required": false,
+      "description": "CDN Environment Variables and Secrets example — docs pattern extraction (reference only)"
+    },
+
+    "cdn-logtime-pattern": {
+      "files": [
+        "examples/logTime/assembly/index.ts",
+        "examples/logTime/package.json"
+      ],
+      "required": false,
+      "description": "CDN LogTime example — docs pattern extraction (reference only)"
+    }
+  },
+  "target_mapping": {
+    "sdk-api": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/sdk-reference-as.md",
+      "section": null
+    },
+
+    "cdn-hello-world-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/base-as.md",
+      "section": null
+    },
+
+    "cdn-body-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/body-as.md",
+      "section": null
+    },
+    "cdn-body-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-body-as.md",
+      "section": null
+    },
+
+    "cdn-geoblock-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/geoblock-as.md",
+      "section": null
+    },
+    "cdn-geoblock-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-geoblock-as.md",
+      "section": null
+    },
+
+    "cdn-headers-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/headers-as.md",
+      "section": null
+    },
+    "cdn-headers-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-headers-as.md",
+      "section": null
+    },
+
+    "cdn-jwt-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/auth-jwt-as.md",
+      "section": null
+    },
+    "cdn-jwt-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-auth-jwt-as.md",
+      "section": null
+    },
+
+    "cdn-kvstore-blueprint": {
+      "reference_file": "plugins/gcore-fastedge/skills/scaffold/reference/cdn/kv-store-as.md",
+      "section": null
+    },
+    "cdn-kvstore-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-kv-store-as.md",
+      "section": null
+    },
+
+    "cdn-georedirect-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-geo-redirect-as.md",
+      "section": null
+    },
+
+    "cdn-properties-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-properties-as.md",
+      "section": null
+    },
+
+    "cdn-env-secrets-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-env-secrets-as.md",
+      "section": null
+    },
+
+    "cdn-logtime-pattern": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/cdn/examples-log-time-as.md",
+      "section": null
+    }
+  },
+  "validation": {
+    "mode": "advisory",
+    "strict_fields": ["sdk-api", "cdn-hello-world-blueprint"]
+  }
+}

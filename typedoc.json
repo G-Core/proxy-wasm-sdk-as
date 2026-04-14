@@ -1,7 +1,0 @@
-{
-  "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./assembly/index.ts", "./assembly/proxy.ts"],
-  "out": "./docs",
-  "name": "AssemblyScript Proxy Runtime",
-  "skipErrorChecking": true
-}
