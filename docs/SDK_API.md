@@ -58,17 +58,22 @@ The `asconfig.json` at the root of your plugin must include the `abort` override
 
 ```json
 {
-  "options": {
-    "use": "abort=abort_proc_exit"
-  },
+  "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json",
   "targets": {
     "debug": {
       "sourceMap": true,
       "debug": true
     },
     "release": {
-      "optimize": true
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
     }
+  },
+  "options": {
+    "bindings": "esm",
+    "use": "abort=abort_proc_exit"
   }
 }
 ```
@@ -93,7 +98,7 @@ Your `package.json` must declare the SDK as a dependency and include `@assemblys
 
 ### RootContext
 
-`RootContext` is created once per VM instance (once per deployed plugin). It holds shared state and configuration that all per-request `Context` instances can access.
+`RootContext` is created once per VM instance (once per deployed plugin). It is the factory for `Context` instances (see [Hook State Isolation](#hook-state-isolation) for lifetime details).
 
 **Import path**: `@gcoredev/proxy-wasm-sdk-as/assembly`
 
@@ -101,7 +106,7 @@ Your `package.json` must declare the SDK as a dependency and include `@assemblys
 class RootContext {
   constructor(context_id: u32)
 
-  // Override to supply per-request Context instances
+  // Override to supply Context instances for each hook invocation
   createContext(context_id: u32): Context
 
   // Called when the VM starts — override to perform startup logic
@@ -120,7 +125,7 @@ You must override `createContext` to return your own `Context` subclass. The def
 **Lifecycle order:**
 
 1. `onStart` — VM is initializing
-2. `createContext` — called once per incoming request
+2. `createContext` — called for each hook invocation (see [Hook State Isolation](#hook-state-isolation))
 3. `onDone` — VM is shutting down
 
 ```typescript

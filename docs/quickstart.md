@@ -125,12 +125,12 @@ registerRootContext((context_id: u32) => {
 
 Override any of these methods on your `Context` subclass to intercept traffic:
 
-| Method                                                                                   | Called when                          |
-| ---------------------------------------------------------------------------------------- | ------------------------------------ |
-| `onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues`         | Inbound request headers arrive       |
-| `onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`  | Inbound request body chunk arrives   |
-| `onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues`              | Outbound response headers arrive     |
-| `onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues` | Outbound response body chunk arrives |
+| Method                                                                                    | Called when                          |
+| ----------------------------------------------------------------------------------------- | ------------------------------------ |
+| `onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues`          | Inbound request headers arrive       |
+| `onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`   | Inbound request body chunk arrives   |
+| `onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues`               | Outbound response headers arrive     |
+| `onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`  | Outbound response body chunk arrives |
 
 Return `FilterHeadersStatusValues.Continue` or `FilterDataStatusValues.Continue` to pass the data through unmodified.
 
@@ -206,9 +206,9 @@ Create `asconfig.json` in your project root:
 | -------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
 | `extends` (wasi-shim)                  | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
 | `options.use: "abort=abort_proc_exit"` | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps.  |
-| `options.bindings: "esm"`              | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
-| `targets.release.outFile`              | Yes      | Path for the compiled release wasm binary.                                                     |
-| `targets.debug.outFile`                | Yes      | Path for the debug wasm binary.                                                                |
+| `options.bindings: "esm"`             | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
+| `targets.release.outFile`             | Yes      | Path for the compiled release wasm binary.                                                     |
+| `targets.debug.outFile`               | Yes      | Path for the debug wasm binary.                                                                |
 
 The `"use": "abort=abort_proc_exit"` option is mandatory. Without it, unhandled aborts in AssemblyScript will not terminate the wasm module correctly on the FastEdge host.
 

@@ -87,7 +87,7 @@ ALL_FILES=("${TIER1_FILES[@]}" "${TIER2_FILES[@]}" "${TIER3_FILES[@]}")
 # =============================================================================
 
 declare -A SOURCE_FILES
-SOURCE_FILES[SDK_API.md]="assembly/index.ts assembly/runtime.ts assembly/exports.ts assembly/fastedge/index.ts assembly/fastedge/dictionary.ts assembly/fastedge/env.ts assembly/fastedge/secrets.ts assembly/fastedge/kvStore.ts assembly/fastedge/utils/index.ts assembly/fastedge/utils/runtime.ts assembly/fastedge/utils/listParser.ts package.json"
+SOURCE_FILES[SDK_API.md]="assembly/index.ts assembly/runtime.ts assembly/exports.ts assembly/fastedge/index.ts assembly/fastedge/dictionary.ts assembly/fastedge/env.ts assembly/fastedge/secrets.ts assembly/fastedge/kvStore.ts assembly/fastedge/utils/index.ts assembly/fastedge/utils/runtime.ts assembly/fastedge/utils/listParser.ts package.json asconfig.json"
 SOURCE_FILES[quickstart.md]="package.json assembly/index.ts examples/helloWorld/assembly/index.ts examples/helloWorld/package.json examples/helloWorld/asconfig.json"
 SOURCE_FILES[INDEX.md]="package.json"
 
