@@ -1,0 +1,24 @@
+{
+  "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json",
+  "targets": {
+    "debug": {
+      "outFile": "build/cors-debug.wasm",
+      "textFile": "build/cors-debug.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "build/cors.wasm",
+      "textFile": "build/cors.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "bindings": "esm",
+    "use": "abort=abort_proc_exit"
+  }
+}

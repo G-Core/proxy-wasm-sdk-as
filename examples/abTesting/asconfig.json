@@ -1,0 +1,24 @@
+{
+  "extends": "./node_modules/@assemblyscript/wasi-shim/asconfig.json",
+  "targets": {
+    "debug": {
+      "outFile": "build/abTesting-debug.wasm",
+      "textFile": "build/abTesting-debug.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "build/abTesting.wasm",
+      "textFile": "build/abTesting.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "bindings": "esm",
+    "use": "abort=abort_proc_exit"
+  }
+}
