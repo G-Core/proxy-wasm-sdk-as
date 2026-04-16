@@ -490,7 +490,7 @@ class HeaderStreamManipulator {
   }
 
   /**
-   * Replace a header.
+   * Replace a header value. No-op if the header is not present.
    * @param key the header name.
    * @param value the header value.
    */
@@ -1125,7 +1125,7 @@ export function deleteContext(context_id: u32): void {
 /**
  * Register a root context factory and make it available to the runtime.
  * @param root_context_factory A function that creates a new root context.
- * @param name Paremeter kept for backwards compatibility. It will be ignored.
+ * @param name Accepted for API compatibility with the proxy-wasm spec but ignored by the FastEdge runtime. The value does not need to match any configuration — pass any descriptive string.
  */
 export function registerRootContext(
   context_factory: (context_id: u32) => RootContext,
