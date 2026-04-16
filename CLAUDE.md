@@ -47,7 +47,7 @@ The SDK has two layers:
 
 ### FastEdge-specific layer (`assembly/fastedge/`)
 
-- **`dictionary.ts`** — `getEnv(name)`: reads environment variables via `proxy_dictionary_get`
+- **`dictionary.ts`** — `getEnv(name)`: reads environment variables via WASI `process.env` (64 KB limit). `getDictionary(name)`: reads via `proxy_dictionary_get` (no size limit, use for values > 64 KB).
 - **`env.ts`** — `getEnvVar(name)`: deprecated wrapper around `process.env` (use `getEnv` instead)
 - **`secrets.ts`** — `getSecret(name)`, `getSecretEffectiveAt(name, slot)`: reads secrets via `proxy_get_secret` / `proxy_get_effective_at_secret`. Also exports `getSecretVar(name)` and `getSecretVarEffectiveAt(name, slot)` as deprecated aliases.
 - **`kvStore.ts`** — `KvStore` class: `open(storeName)`, `get(key)`, `scan(pattern)`, `zrangeByScore(key, min, max)`, `zscan(key, pattern)`, `bfExists(key, item)`. Also exports `ValueScoreTuple` type used by zrange/zscan results.
@@ -66,18 +66,27 @@ Host-allocated buffers are managed through `ArrayBufferReference` in `runtime.ts
 
 ## Examples
 
-The `examples/` directory contains 8 standalone examples. Each is an independent package with its own `package.json`, `asconfig.json`, and `node_modules`. They reference the SDK via `"file:../.."` (local), not the published npm version.
+The `examples/` directory contains 17 standalone examples. Each is an independent package with its own `package.json`, `asconfig.json`, and `node_modules`. They reference the SDK via `"file:../.."` (local), not the published npm version.
 
-| Example       | Description                                                                 |
-| ------------- | --------------------------------------------------------------------------- |
-| `body`        | Request/response body read and manipulation                                 |
-| `geoBlock`    | Block requests by country using a `BLACKLIST` env var                       |
-| `geoRedirect` | Route requests to different origins by country code                         |
-| `headers`     | Add, remove, and replace HTTP headers with validation                       |
-| `jwt`         | Validate JWT Bearer tokens (requires `@gcoredev/as-jwt` dep)                |
-| `kvStore`     | Query a KV Store — get/scan/zrange/zscan/bfExists (has `assembly/utils.ts`) |
-| `logTime`     | Log UTC timestamps at request and response phases                           |
-| `properties`  | Read and expose FastEdge runtime properties                                 |
+| Example               | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| `abTesting`           | Cookie-based A/B traffic splitting at the CDN layer                         |
+| `apiKey`              | Validate `X-API-Key` header against a secret                               |
+| `body`                | Request/response body read and manipulation                                 |
+| `cacheControl`        | Content-type-aware Cache-Control response headers                           |
+| `cors`                | CORS preflight handling and response headers                                |
+| `customErrorPages`    | Replace 4xx/5xx responses with branded HTML error pages                     |
+| `geoBlock`            | Block requests by country using a `BLACKLIST` env var                       |
+| `geoRedirect`         | Route requests to different origins by country code                         |
+| `headers`             | Add, remove, and replace HTTP headers with validation                       |
+| `helloWorld`          | Minimal CDN app skeleton — all lifecycle hooks with pass-through            |
+| `httpCall`            | Async HTTP dispatch to an external service with callback                    |
+| `jwt`                 | Validate JWT Bearer tokens (requires `@gcoredev/as-jwt` dep)               |
+| `kvStore`             | Query a KV Store — get/scan/zrange/zscan/bfExists (has `assembly/utils.ts`) |
+| `largeDictionary`     | Read large env vars (> 64 KB) via `getDictionary` / dictionary API          |
+| `logTime`             | Log UTC timestamps at request and response phases                           |
+| `properties`          | Read and expose FastEdge runtime properties                                 |
+| `variablesAndSecrets` | Read environment variables and secrets, forward as headers                  |
 
 Build output per example: `build/<name>.wasm` (release), `build/<name>-debug.wasm` (debug). The `build/` and `node_modules/` directories are gitignored per example.
 

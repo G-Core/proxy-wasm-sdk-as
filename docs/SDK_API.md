@@ -321,7 +321,7 @@ Returned from `onRequestHeaders` and `onResponseHeaders`.
 | Value                          | Integer | Description                                               |
 | ------------------------------ | ------- | --------------------------------------------------------- |
 | `Continue`                     | 0       | Pass headers downstream and continue processing.          |
-| `StopIteration`                | 1       | Pause header processing; resume with `continueRequest()`. |
+| `StopIteration`                | 1       | Pause header processing.                                  |
 | `ContinueAndEndStream`         | 2       | Continue processing and mark the stream as ended.         |
 | `StopAllIterationAndBuffer`    | 3       | Stop all iteration and buffer the body.                   |
 | `StopAllIterationAndWatermark` | 4       | Stop all iteration until the buffer watermark is reached. |
@@ -485,7 +485,7 @@ function set_buffer_bytes(
 ): WasmResultValues;
 ```
 
-`get_buffer_bytes` reads a slice of the body or buffer starting at `start` for `length` bytes. Returns an empty `ArrayBuffer` (byteLength 0) on failure or when the buffer is empty.
+`get_buffer_bytes` reads a slice of the body or buffer starting at `start` for `length` bytes. Returns an empty `ArrayBuffer` (`byteLength == 0`) on failure or when the buffer is empty.
 
 `set_buffer_bytes` replaces the range `[start, start+length)` in the body or buffer with `value`. To replace the entire body, pass `start=0` and `length=body_buffer_length`.
 
@@ -510,7 +510,7 @@ onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusV
   const body = get_buffer_bytes(
     BufferTypeValues.HttpRequestBody,
     0,
-    body_buffer_length as u32
+    body_buffer_length as u32,
   );
   const text = String.UTF8.decode(body);
   log(LogLevelValues.info, "Body: " + text);
@@ -520,7 +520,7 @@ onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusV
     BufferTypeValues.HttpRequestBody,
     0,
     body_buffer_length as u32,
-    modified
+    modified,
   );
   return FilterDataStatusValues.Continue;
 }
@@ -547,7 +547,7 @@ function get_property(path: string): ArrayBuffer;
 function set_property(path: string, data: ArrayBuffer): WasmResultValues;
 ```
 
-`get_property` returns an empty `ArrayBuffer` (byteLength 0) when the property is not found. Check `byteLength > 0` before decoding. All properties listed below are UTF-8 encoded strings decoded with `String.UTF8.decode()`, except `response.status` which is a 2-byte big-endian unsigned 16-bit integer.
+`get_property` returns an empty `ArrayBuffer` (`byteLength == 0`) when the property is not found. Check `byteLength > 0` before decoding. All properties listed below are UTF-8 encoded strings decoded with `String.UTF8.decode()`, except `response.status` which is a 2-byte big-endian unsigned 16-bit integer.
 
 `set_property` stores a custom property value accessible in later hooks via `get_property`. It does not modify the built-in properties in the table below.
 
@@ -651,7 +651,7 @@ onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues {
       [
         makeHeaderPair("content-type", "text/plain"),
         makeHeaderPair("www-authenticate", "Bearer"),
-      ]
+      ],
     );
     return FilterHeadersStatusValues.StopIteration;
   }
@@ -688,15 +688,15 @@ class RootContext {
 
 **Parameters:**
 
-| Parameter              | Type                                                                                   | Description                                                                                                              |
-| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `cluster`              | `string`                                                                               | The upstream host to call. Must be a public host.                                                                        |
-| `headers`              | `Headers`                                                                              | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
-| `body`                 | `ArrayBuffer`                                                                          | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
-| `trailers`             | `Headers`                                                                              | Request trailers. Pass `[]` if none.                                                                                     |
-| `timeout_milliseconds` | `u32`                                                                                  | Request timeout in milliseconds.                                                                                         |
-| `origin_context`       | `BaseContext`                                                                          | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
-| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void` | Callback invoked when the response is received.                                                                          |
+| Parameter              | Type                                                                                    | Description                                                                                                              |
+| ---------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster`              | `string`                                                                                | The upstream host to call. Must be a public host.                                                                        |
+| `headers`              | `Headers`                                                                               | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
+| `body`                 | `ArrayBuffer`                                                                           | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
+| `trailers`             | `Headers`                                                                               | Request trailers. Pass `[]` if none.                                                                                     |
+| `timeout_milliseconds` | `u32`                                                                                   | Request timeout in milliseconds.                                                                                         |
+| `origin_context`       | `BaseContext`                                                                           | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
+| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void`  | Callback invoked when the response is received.                                                                          |
 
 In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`.
 
@@ -799,7 +799,7 @@ function registerRootContext(
 ): void;
 ```
 
-The `name` parameter is accepted for backwards compatibility but is ignored by the runtime.
+The `name` parameter is accepted for API compatibility with the proxy-wasm spec but is ignored by the FastEdge runtime. The value does not need to match any configuration — pass any descriptive string.
 
 ```typescript
 registerRootContext(
@@ -818,7 +818,7 @@ These APIs are specific to the FastEdge platform and are not part of the core pr
 
 ### Environment Variables (getEnv)
 
-Read environment variables configured at deployment time via the FastEdge platform.
+Read environment variables configured at deployment time via the FastEdge platform. Uses the standard WASI environment interface (subject to the 64 KB per-variable size limit).
 
 ```typescript
 function getEnv(name: string): string;
@@ -836,6 +836,29 @@ if (blocklist.length == 0) {
 }
 ```
 
+### Dictionary (getDictionary)
+
+Read dictionary values using the proxy-wasm `proxy_dictionary_get` host call. This bypasses the 64 KB WASI environment variable size limit and should be used when a value may be larger than 64 KB (e.g. large JSON configs, PEM certificates, policy documents).
+
+```typescript
+function getDictionary(name: string): string;
+```
+
+Returns the value, or an empty string if not found.
+
+| Function              | Use when                                   |
+| --------------------- | ------------------------------------------ |
+| `getEnv(name)`        | Variable value is under 64 KB (most cases) |
+| `getDictionary(name)` | Variable value may exceed 64 KB            |
+
+```typescript
+import { getDictionary } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
+import { log, LogLevelValues } from "@gcoredev/proxy-wasm-sdk-as/assembly";
+
+const config = getDictionary("LARGE_CONFIG");
+log(LogLevelValues.info, "Config size: " + config.length.toString() + " bytes");
+```
+
 ### Secrets (getSecret, getSecretEffectiveAt)
 
 Read secret values stored in the FastEdge secrets store. Secrets are configured via the platform and are not visible in logs or configuration files.
@@ -847,7 +870,7 @@ function getSecretEffectiveAt(name: string, effectiveAt: u32): string;
 
 `getSecret` returns the current value of the named secret, or an empty string if not found.
 
-`getSecretEffectiveAt` reads a secret from a specific rotation slot. Use this for secret rotation: pass the current Unix timestamp in seconds as `effectiveAt`. The host selects the slot where `effectiveAt >= secret_slots.slot`.
+`getSecretEffectiveAt` reads a secret from a specific rotation slot. Slots are defined in the FastEdge UI and are always numeric (e.g., incremental integers, or timestamp-style values representing a point in time). Use this for secret rotation: pass the current Unix timestamp in seconds as `effectiveAt`. The host selects the slot where `effectiveAt >= secret_slots.slot`.
 
 ```typescript
 import {
