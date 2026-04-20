@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # KV Store
 
 This application demonstrates reading from a FastEdge KV Store via query parameters, supporting multiple access patterns: `get`, `scan`, `zrange`, `zscan`, and `bfExists`.

@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Properties
 
 This application reads and logs all known FastEdge runtime properties, exposing them as response headers.

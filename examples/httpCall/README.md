@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # HTTP Call
 
 This application makes an asynchronous HTTP call to an external service using the proxy-wasm HTTP dispatch API.

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@gcoredev/as-jwt": "^1.0.3",
-    "@gcoredev/proxy-wasm-sdk-as": "file:../..",
+    "@gcoredev/proxy-wasm-sdk-as": "^1.2.3",
     "assemblyscript-json": "^1.1.0"
   },
   "devDependencies": {

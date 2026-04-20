@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Cache Control
 
 This application sets `Cache-Control` response headers based on the content type and response status, giving you fine-grained control over CDN caching behaviour.

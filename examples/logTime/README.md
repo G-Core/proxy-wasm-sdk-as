@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Log Time
 
 This application logs UTC timestamps at the start of both the request and response phases.

@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Hello World — Minimal CDN App
 
 The simplest possible FastEdge CDN application using the AssemblyScript proxy-wasm SDK. All four lifecycle hooks are present with pass-through implementations.

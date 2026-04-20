@@ -8,7 +8,7 @@
     "asbuild": "npm run asbuild:debug && npm run asbuild:release"
   },
   "dependencies": {
-    "@gcoredev/proxy-wasm-sdk-as": "file:../.."
+    "@gcoredev/proxy-wasm-sdk-as": "^1.2.3"
   },
   "devDependencies": {
     "@assemblyscript/wasi-shim": "^0.1.0",

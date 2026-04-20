@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # API Key
 
 This application validates requests using an `X-API-Key` header checked against a stored secret.

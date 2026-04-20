@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Headers
 
 This application demonstrates adding, removing, and modifying HTTP headers in both the `onRequestHeaders` and `onResponseHeaders` lifecycle hooks, then validates that the mutations took effect.

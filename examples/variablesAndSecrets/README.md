@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Variables and Secrets
 
 This application demonstrates reading environment variables and secrets, then forwarding their values as request headers to the upstream.

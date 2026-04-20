@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Large Dictionary
 
 This application demonstrates how to read large environment variables (> 64 KB) using the proxy-wasm dictionary API.

@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # Body
 
 This application modifies the request and response body using the `onRequestBody` and `onResponseBody` lifecycle hooks.
