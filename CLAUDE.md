@@ -47,7 +47,7 @@ The SDK has two layers:
 
 ### FastEdge-specific layer (`assembly/fastedge/`)
 
-- **`dictionary.ts`** — `getEnv(name)`: reads environment variables via WASI `process.env` (64 KB limit). `getDictionary(name)`: reads via `proxy_dictionary_get` (no size limit, use for values > 64 KB).
+- **`dictionary.ts`** — `getEnv(name)`: reads environment variables via WASI `process.env` (64 KB limit). `getDictionary(name)`: reads via `proxy_dictionary_get` (2Mb limit, use for values > 64 KB).
 - **`env.ts`** — `getEnvVar(name)`: deprecated wrapper around `process.env` (use `getEnv` instead)
 - **`secrets.ts`** — `getSecret(name)`, `getSecretEffectiveAt(name, slot)`: reads secrets via `proxy_get_secret` / `proxy_get_effective_at_secret`. Also exports `getSecretVar(name)` and `getSecretVarEffectiveAt(name, slot)` as deprecated aliases.
 - **`kvStore.ts`** — `KvStore` class: `open(storeName)`, `get(key)`, `scan(pattern)`, `zrangeByScore(key, min, max)`, `zscan(key, pattern)`, `bfExists(key, item)`. Also exports `ValueScoreTuple` type used by zrange/zscan results.
@@ -71,7 +71,7 @@ The `examples/` directory contains 17 standalone examples. Each is an independen
 | Example               | Description                                                                 |
 | --------------------- | --------------------------------------------------------------------------- |
 | `abTesting`           | Cookie-based A/B traffic splitting at the CDN layer                         |
-| `apiKey`              | Validate `X-API-Key` header against a secret                               |
+| `apiKey`              | Validate `X-API-Key` header against a secret                                |
 | `body`                | Request/response body read and manipulation                                 |
 | `cacheControl`        | Content-type-aware Cache-Control response headers                           |
 | `cors`                | CORS preflight handling and response headers                                |
@@ -81,7 +81,7 @@ The `examples/` directory contains 17 standalone examples. Each is an independen
 | `headers`             | Add, remove, and replace HTTP headers with validation                       |
 | `helloWorld`          | Minimal CDN app skeleton — all lifecycle hooks with pass-through            |
 | `httpCall`            | Async HTTP dispatch to an external service with callback                    |
-| `jwt`                 | Validate JWT Bearer tokens (requires `@gcoredev/as-jwt` dep)               |
+| `jwt`                 | Validate JWT Bearer tokens (requires `@gcoredev/as-jwt` dep)                |
 | `kvStore`             | Query a KV Store — get/scan/zrange/zscan/bfExists (has `assembly/utils.ts`) |
 | `largeDictionary`     | Read large env vars (> 64 KB) via `getDictionary` / dictionary API          |
 | `logTime`             | Log UTC timestamps at request and response phases                           |
