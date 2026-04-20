@@ -92,8 +92,7 @@ class HttpHeaders extends Context {
     stream_context.headers.request.add("new-header-02", "value-02");
     stream_context.headers.request.add("new-header-03", "value-03");
 
-    // Remove a header
-    // Known issue: - nginx will not remove the header it will set it to an empty value.
+    // Remove header, expected empty value (FastEdge/nginx sets to empty, does not delete)
     stream_context.headers.request.remove("new-header-01");
 
     // Modify a header
@@ -126,7 +125,9 @@ class HttpHeaders extends Context {
     }
 
     // Initialize expectedHeaders
+    // Note: remove sets header to empty value (not deleted) — matches FastEdge/nginx behavior
     const expectedHeaders = new Set<string>();
+    expectedHeaders.add("new-header-01:");
     expectedHeaders.add("new-header-02:new-value-02");
     expectedHeaders.add("new-header-03:value-03");
     expectedHeaders.add("new-header-03:value-03-a");
@@ -199,7 +200,9 @@ class HttpHeaders extends Context {
     stream_context.headers.response.add("new-header-03", "value-03-a");
 
     // Initialize expectedHeaders before using it
+    // Note: remove sets header to empty value (not deleted) — matches FastEdge/nginx behavior
     const expectedHeaders = new Set<string>();
+    expectedHeaders.add("new-header-01:");
     expectedHeaders.add("new-header-02:new-value-02");
     expectedHeaders.add("new-header-03:value-03");
     expectedHeaders.add("new-header-03:value-03-a");

@@ -1,0 +1,17 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Origin returns 418 — no specific image/message, falls back to generic 4xx template",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "x-debugger-status": "418",
+      "x-debugger-content": "status-only"
+    },
+    "body": ""
+  },
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

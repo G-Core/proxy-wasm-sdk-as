@@ -1,18 +1,13 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "No X-API-Key header — returns 401 with WWW-Authenticate challenge",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
     "headers": {
-      "host": "example.com"
+      "host": "api.example.com"
     },
     "body": ""
-  },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
   },
   "dotenv": {
     "enabled": true,

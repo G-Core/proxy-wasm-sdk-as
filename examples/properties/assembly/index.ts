@@ -21,7 +21,6 @@ const REQUEST_QUERY = "request.query";
 const REQUEST_X_REAL_IP = "request.x_real_ip";
 const REQUEST_COUNTRY = "request.country";
 const REQUEST_CITY = "request.city";
-const REQUEST_VAR = "request.var";
 
 class PropertiesRoot extends RootContext {
   createContext(context_id: u32): Context {
@@ -101,10 +100,6 @@ class Properties extends Context {
     }
 
     if (!handleProperty(REQUEST_CITY, 559, "city", "request-city")) {
-      return FilterHeadersStatusValues.StopIteration;
-    }
-
-    if (!handleProperty(REQUEST_VAR, 560)) {
       return FilterHeadersStatusValues.StopIteration;
     }
 

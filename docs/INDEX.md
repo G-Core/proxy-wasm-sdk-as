@@ -1,6 +1,6 @@
 # @gcoredev/proxy-wasm-sdk-as Documentation
 
-AssemblyScript SDK for writing proxy-wasm filter plugins that run on the FastEdge CDN platform. Version 1.2.0.
+AssemblyScript SDK for writing proxy-wasm filter plugins that run on the FastEdge CDN platform. Version 1.2.3.
 
 ## Documents
 

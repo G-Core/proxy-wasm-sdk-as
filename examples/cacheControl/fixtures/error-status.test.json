@@ -1,18 +1,20 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "Origin returns 500 error — sets Cache-Control: no-store regardless of content type",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
     "headers": {
-      "host": "example.com"
+      "host": "example.com",
+      "x-debugger-status": "500"
     },
     "body": ""
   },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
+  "response": {
+    "headers": {
+      "content-type": "text/html"
+    },
+    "body": "<html><body>Internal Server Error</body></html>"
   },
   "dotenv": {
     "enabled": true,

@@ -1,18 +1,19 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "Image response — sets long-lived immutable cache for static assets",
   "request": {
     "method": "GET",
-    "url": "http://fastedge-builtin.debug",
+    "url": "http://fastedge-builtin.debug/logo.png",
     "headers": {
       "host": "example.com"
     },
     "body": ""
   },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
+  "response": {
+    "headers": {
+      "content-type": "image/png"
+    },
+    "body": ""
   },
   "dotenv": {
     "enabled": true,

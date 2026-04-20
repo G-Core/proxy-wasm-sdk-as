@@ -1,6 +1,6 @@
 # AssemblyScript Proxy-Wasm SDK — API Reference
 
-Complete API reference for `@gcoredev/proxy-wasm-sdk-as` version 1.2.0. This SDK enables writing CDN filter applications (proxy-wasm plugins) in AssemblyScript that compile to WebAssembly and run on the FastEdge platform.
+Complete API reference for `@gcoredev/proxy-wasm-sdk-as` version 1.2.3. This SDK enables writing CDN filter applications (proxy-wasm plugins) in AssemblyScript that compile to WebAssembly and run on the FastEdge platform.
 
 ## Quick Start
 
@@ -83,7 +83,7 @@ Your `package.json` must declare the SDK as a dependency and include `@assemblys
 ```json
 {
   "dependencies": {
-    "@gcoredev/proxy-wasm-sdk-as": "^1.2.0"
+    "@gcoredev/proxy-wasm-sdk-as": "^1.2.3"
   },
   "devDependencies": {
     "assemblyscript": "^0.28.9",
@@ -688,15 +688,15 @@ class RootContext {
 
 **Parameters:**
 
-| Parameter              | Type                                                                                    | Description                                                                                                              |
-| ---------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `cluster`              | `string`                                                                                | The upstream host to call. Must be a public host.                                                                        |
-| `headers`              | `Headers`                                                                               | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
-| `body`                 | `ArrayBuffer`                                                                           | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
-| `trailers`             | `Headers`                                                                               | Request trailers. Pass `[]` if none.                                                                                     |
-| `timeout_milliseconds` | `u32`                                                                                   | Request timeout in milliseconds.                                                                                         |
-| `origin_context`       | `BaseContext`                                                                           | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
-| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void`  | Callback invoked when the response is received.                                                                          |
+| Parameter              | Type                                                                                   | Description                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster`              | `string`                                                                               | The upstream host to call. Must be a public host.                                                                        |
+| `headers`              | `Headers`                                                                              | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
+| `body`                 | `ArrayBuffer`                                                                          | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
+| `trailers`             | `Headers`                                                                              | Request trailers. Pass `[]` if none.                                                                                     |
+| `timeout_milliseconds` | `u32`                                                                                  | Request timeout in milliseconds.                                                                                         |
+| `origin_context`       | `BaseContext`                                                                          | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
+| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void` | Callback invoked when the response is received.                                                                          |
 
 In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`.
 

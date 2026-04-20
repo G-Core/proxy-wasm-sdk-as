@@ -22,30 +22,30 @@ class HelloWorld extends Context {
 
   onRequestHeaders(
     headers: u32,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterHeadersStatusValues {
-    log(LogLevelValues.info, "onRequestHeaders >>");
+    log(LogLevelValues.info, "onRequestHeaders >> Hello World!");
     return FilterHeadersStatusValues.Continue;
   }
 
   onRequestBody(
     body_buffer_length: usize,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterDataStatusValues {
-    log(LogLevelValues.info, "onRequestBody >>");
+    log(LogLevelValues.info, "onRequestBody >> Hello World!");
     return FilterDataStatusValues.Continue;
   }
 
   onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    log(LogLevelValues.info, "onResponseHeaders >>");
+    log(LogLevelValues.info, "onResponseHeaders >> Hello World!");
     return FilterHeadersStatusValues.Continue;
   }
 
   onResponseBody(
     body_buffer_length: usize,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterDataStatusValues {
-    log(LogLevelValues.info, "onResponseBody >>");
+    log(LogLevelValues.info, "onResponseBody >> Hello World!");
     return FilterDataStatusValues.Continue;
   }
 }

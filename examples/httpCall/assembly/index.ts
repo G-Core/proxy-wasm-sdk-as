@@ -62,36 +62,35 @@ class HttpCallRoot extends RootContext {
 }
 
 class HttpCallContext extends Context {
+  httpCallDone: bool = false;
+
   constructor(context_id: u32, root_context: HttpCallRoot) {
     super(context_id, root_context);
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
+    if (this.httpCallDone) {
+      log(LogLevelValues.info, "HTTP call response was received successfully, resuming request.");
+      return FilterHeadersStatusValues.Continue;
+    }
+
     log(LogLevelValues.info, "onRequestHeaders >> dispatching HTTP call");
 
-    const authority = stream_context.headers.request.get(":authority");
-    const scheme = stream_context.headers.request.get(":scheme");
-
     const headers = new Array<HeaderPair>();
-    headers.push(makeHeaderPair(":authority", authority));
-    headers.push(makeHeaderPair(":scheme", scheme !== "" ? scheme : "https"));
+    headers.push(makeHeaderPair(":scheme", "https"));
+    headers.push(makeHeaderPair(":authority", "httpbin.org"));
     headers.push(makeHeaderPair(":path", "/ip"));
     headers.push(makeHeaderPair(":method", "GET"));
     headers.push(makeHeaderPair("User-Agent", "fastedge"));
 
     const result = (this.root_context as HttpCallRoot).httpCall(
-      authority,
+      "httpbin.org",
       headers,
       new ArrayBuffer(0),
       new Array<HeaderPair>(),
       1000,
       this,
-      (
-        ctx: BaseContext,
-        hdrs: u32,
-        bodySize: usize,
-        trls: u32,
-      ): void => {},
+      (ctx: BaseContext, hdrs: u32, bodySize: usize, trls: u32): void => {},
     );
 
     if (result != WasmResultValues.Ok) {
@@ -108,6 +107,7 @@ class HttpCallContext extends Context {
       return FilterHeadersStatusValues.StopIteration;
     }
 
+    this.httpCallDone = true;
     log(LogLevelValues.info, "HTTP call dispatched, pausing request");
 
     // Pause the request until the HTTP call response arrives

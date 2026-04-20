@@ -1,6 +1,6 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "HTML response — sets public cache with must-revalidate and Vary header",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
@@ -9,10 +9,11 @@
     },
     "body": ""
   },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
+  "response": {
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "body": "<html><body>Hello</body></html>"
   },
   "dotenv": {
     "enabled": true,

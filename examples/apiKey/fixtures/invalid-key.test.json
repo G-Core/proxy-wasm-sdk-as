@@ -1,18 +1,14 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "Wrong API key — returns 403 Forbidden",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
     "headers": {
-      "host": "example.com"
+      "host": "api.example.com",
+      "X-API-Key": "wrong-key-99999"
     },
     "body": ""
-  },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
   },
   "dotenv": {
     "enabled": true,

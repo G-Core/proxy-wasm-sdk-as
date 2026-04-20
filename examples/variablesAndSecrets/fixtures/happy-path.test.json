@@ -1,24 +1,16 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "Reads USERNAME env var and PASSWORD secret, forwards as request headers",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
-    "headers": {
-      "host": "example.com"
-    },
+    "headers": {},
     "body": ""
-  },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
   },
   "dotenv": {
     "enabled": true,
     "path": "."
   },
-  "logLevel": 2,
   "wasm": {
     "path": "<workspace>/.fastedge-debug/app.wasm",
     "description": "Default debugger WASM binary"

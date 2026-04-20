@@ -1,18 +1,19 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "JSON API response with API_MAX_AGE=0 — sets no-cache, no-store for API data",
   "request": {
     "method": "GET",
-    "url": "http://fastedge-builtin.debug",
+    "url": "http://fastedge-builtin.debug/api/data",
     "headers": {
-      "host": "example.com"
+      "host": "api.example.com"
     },
     "body": ""
   },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
+  "response": {
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": "{\"items\": []}"
   },
   "dotenv": {
     "enabled": true,

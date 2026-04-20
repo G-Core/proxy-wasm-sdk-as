@@ -22,7 +22,7 @@ npm init -y
 Install the SDK and AssemblyScript toolchain:
 
 ```bash
-npm install @gcoredev/proxy-wasm-sdk-as@1.2.0
+npm install @gcoredev/proxy-wasm-sdk-as@1.2.3
 npm install --save-dev assemblyscript@^0.28.9 @assemblyscript/wasi-shim@^0.1.0
 ```
 
@@ -202,13 +202,13 @@ Create `asconfig.json` in your project root:
 
 ### Configuration fields
 
-| Field                                  | Required | Description                                                                                    |
-| -------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `extends` (wasi-shim)                  | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
-| `options.use: "abort=abort_proc_exit"` | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps. |
-| `options.bindings: "esm"`             | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
-| `targets.release.outFile`             | Yes      | Path for the compiled release wasm binary.                                                     |
-| `targets.debug.outFile`               | Yes      | Path for the debug wasm binary.                                                                |
+| Field                                    | Required | Description                                                                                    |
+| ---------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `extends` (wasi-shim)                    | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
+| `options.use: "abort=abort_proc_exit"`   | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps. |
+| `options.bindings: "esm"`               | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
+| `targets.release.outFile`               | Yes      | Path for the compiled release wasm binary.                                                     |
+| `targets.debug.outFile`                 | Yes      | Path for the debug wasm binary.                                                                |
 
 The `"use": "abort=abort_proc_exit"` option is mandatory. Without it, unhandled aborts in AssemblyScript will not terminate the wasm module correctly on the FastEdge host.
 

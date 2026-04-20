@@ -1,6 +1,6 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "No env vars configured — returns 500 misconfigured error",
   "request": {
     "method": "GET",
     "url": "http://fastedge-builtin.debug",
@@ -10,13 +10,8 @@
     "body": ""
   },
   "properties": {
-    "request.country": "DE",
     "request.host": "example.com",
-    "request.path": "/test"
-  },
-  "dotenv": {
-    "enabled": true,
-    "path": "."
+    "request.path": "/landing"
   },
   "logLevel": 2,
   "wasm": {

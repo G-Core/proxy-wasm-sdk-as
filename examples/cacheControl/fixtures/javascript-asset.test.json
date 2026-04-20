@@ -1,18 +1,19 @@
 {
   "appType": "proxy-wasm",
-  "description": "Country code DE - redirects to Germany-specific origin",
+  "description": "JavaScript file — treated as static asset with immutable cache",
   "request": {
     "method": "GET",
-    "url": "http://fastedge-builtin.debug",
+    "url": "http://fastedge-builtin.debug/app.js",
     "headers": {
       "host": "example.com"
     },
     "body": ""
   },
-  "properties": {
-    "request.country": "DE",
-    "request.host": "example.com",
-    "request.path": "/test"
+  "response": {
+    "headers": {
+      "content-type": "application/javascript"
+    },
+    "body": "console.log('hello');"
   },
   "dotenv": {
     "enabled": true,

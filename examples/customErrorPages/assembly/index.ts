@@ -22,9 +22,6 @@ class ErrorPagesRoot extends RootContext {
 }
 
 class ErrorPagesContext extends Context {
-  private isError: bool = false;
-  private statusCode: u32 = 0;
-
   constructor(context_id: u32, root_context: ErrorPagesRoot) {
     super(context_id, root_context);
   }
@@ -39,9 +36,6 @@ class ErrorPagesContext extends Context {
     const code: u32 = (u32(bytes[0]) << 8) | u32(bytes[1]);
 
     if (code >= 400 && code < 600) {
-      this.isError = true;
-      this.statusCode = code;
-
       stream_context.headers.response.replace("Content-Type", "text/html");
       stream_context.headers.response.remove("Content-Length");
       stream_context.headers.response.replace("Transfer-Encoding", "Chunked");
@@ -56,15 +50,22 @@ class ErrorPagesContext extends Context {
     body_buffer_length: usize,
     end_of_stream: bool,
   ): FilterDataStatusValues {
-    if (!this.isError) {
+    // Read response status from property (no instance state between hooks)
+    const statusBuf = get_property("response.status");
+    if (statusBuf.byteLength < 2) {
+      return FilterDataStatusValues.Continue;
+    }
+
+    const bytes = Uint8Array.wrap(statusBuf);
+    const code: u32 = (u32(bytes[0]) << 8) | u32(bytes[1]);
+
+    if (code < 400 || code >= 600) {
       return FilterDataStatusValues.Continue;
     }
 
     if (!end_of_stream) {
       return FilterDataStatusValues.StopIterationAndBuffer;
     }
-
-    const code = this.statusCode;
     const title = this.getErrorTitle(code);
     const description = this.getErrorDescription(code);
     const category = code >= 500 ? "Server Error" : "Client Error";
