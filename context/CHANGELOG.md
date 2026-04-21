@@ -2,6 +2,40 @@
 
 Use `grep` to search this file — do not read linearly as it grows.
 
+## [2026-04-21] — Backfilled tsconfig.json Across Examples
+
+### Overview
+Added `tsconfig.json` to the 7 example projects that lacked one, unifying IDE/LSP DX across all 17 examples.
+
+### Decisions
+- `tsconfig.json` is IDE-only: `asc` consumes `asconfig.json`, not tsconfig. Adding it has zero compile impact.
+- Content is identical across examples: extends `assemblyscript/std/assembly.json`, includes `./**/*.ts`. The extended config provides AS's global type declarations so IDEs stop flagging `u32`, `bool`, `usize`, `String.UTF8`, etc. as errors.
+- Convention captured in `BUILD_AND_EXAMPLES.md` (directory layout + new `tsconfig.json` pattern section + "Adding a New Example" checklist) and `.generation-config.md` (quickstart source files + required content) so future examples include it by default.
+
+### Changes
+- Added identical `tsconfig.json` to: `abTesting`, `apiKey`, `cacheControl`, `cors`, `customErrorPages`, `helloWorld`, `largeDictionary`.
+- `context/development/BUILD_AND_EXAMPLES.md`: added `tsconfig.json` to the example layout diagram, added a new "Example tsconfig.json Pattern" section, updated "Adding a New Example" step 1.
+- `fastedge-plugin-source/.generation-config.md`: added `examples/helloWorld/tsconfig.json` as a quickstart source file; updated Required Content to document it.
+
+## [2026-04-21] — HTTP Call Resume Contract Documented
+
+### Overview
+Corrected documentation and the `httpCall` example to reflect FastEdge's host-driven resume model, which differs from canonical proxy-wasm.
+
+### Decisions
+- Canonical pattern is **B2**: use the `cb` argument to `httpCall`, do NOT override `RootContext.onHttpCallResponse`. Chose over a Rust-mirroring override pattern because `proxy_on_http_call_response` in the AS SDK dispatches to the singleton root (not per-request context), so the SDK's default `onHttpCallResponse` (which routes through `cb` with `setEffectiveContext` correctly applied) is the path that reaches per-Context logic. Mirroring Rust's `Context`-method override would require either bypassing or duplicating that routing.
+- Callback is a **named module-level function**, not an anonymous arrow. Named functions cannot close over mutable state, which structurally satisfies AssemblyScript's closure restriction (instead of relying on inspection to confirm no mutable capture) and keeps the `httpCall(...)` call site readable. If Context state is needed inside the handler, downcast `ctx as MyContext`.
+- Instance-field latch (`httpCallDispatched`) is load-bearing, not cosmetic. Without it, re-invocation of the originating hook dispatches a new HTTP call on every re-entry and loops until timeout.
+- Instance fields persist across the re-invocation (same hook, same Context, same wasm invocation chain) — a narrower guarantee than "persist across hooks" (which does not hold). Documented as an explicit exception to Hook State Isolation.
+- `BaseContext.continueRequest()` / `proxy_continue_stream` is ceremonial on FastEdge: no-op host impl, resume is implicit. Do not suggest it as the resume mechanism.
+
+### Changes
+- `context/architecture/PROXY_WASM_LIFECYCLE.md`: added a divergence banner in Overview; rewrote "Async HTTP Callbacks" section with full host-driven flow, latch pattern, state-isolation interaction, and override anti-patterns.
+- `context/reference/HOST_FUNCTIONS.md`: corrected `proxy_continue_stream`, `proxy_close_stream`, and `proxy_http_call` table entries to reflect FastEdge runtime behavior.
+- `fastedge-plugin-source/.generation-config.md`: added "CRITICAL — HTTP Call Resume Contract" block under `docs/SDK_API.md` → Required Content; updated the `httpCall` bullet to reference it. Regenerate `docs/SDK_API.md` to propagate to consumer docs.
+- `examples/httpCall/assembly/index.ts`: refactored to B2 pattern — removed `onHttpCallResponse` override on root, extracted response handling into a named module-level function `handleHttpCallResponse` (avoiding a name collision with the SDK's `RootContext.onHttpCallResponse` method), renamed `httpCallDone` → `httpCallDispatched`, added a comment explaining the re-entry contract.
+- `examples/httpCall/README.md`: updated "What it does" and "Key concepts" to describe the latch + re-invocation model and call out the divergence from canonical proxy-wasm.
+
 ## [2026-04-20] — Context System Bootstrap
 
 ### Overview

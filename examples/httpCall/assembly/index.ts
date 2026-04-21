@@ -19,58 +19,61 @@ import { setLogLevel } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
 const INTERNAL_SERVER_ERROR: u32 = 500;
 
+function handleHttpCallResponse(
+  ctx: BaseContext,
+  hdrs: u32,
+  bodySize: usize,
+  trls: u32,
+): void {
+  if (hdrs == 0) {
+    log(LogLevelValues.error, "HTTP call failed — no response received");
+    return;
+  }
+
+  const userAgent = stream_context.headers.http_callback.get("user-agent");
+  if (userAgent !== "") {
+    log(LogLevelValues.info, "User-Agent: " + userAgent);
+  }
+
+  if (bodySize > 0) {
+    const bodyBytes = get_buffer_bytes(
+      BufferTypeValues.HttpCallResponseBody,
+      0,
+      bodySize as u32,
+    );
+    const bodyStr = String.UTF8.decode(bodyBytes);
+    log(
+      LogLevelValues.info,
+      "Response body (" + bodySize.toString() + " bytes): " + bodyStr,
+    );
+  } else {
+    log(LogLevelValues.info, "Response body: empty");
+  }
+}
+
 class HttpCallRoot extends RootContext {
   createContext(context_id: u32): Context {
     setLogLevel(LogLevelValues.info);
     return new HttpCallContext(context_id, this);
   }
-
-  onHttpCallResponse(
-    token: u32,
-    headers: u32,
-    body_size: u32,
-    trailers: u32,
-  ): void {
-    log(
-      LogLevelValues.info,
-      "Received http call response with token id: " + token.toString(),
-    );
-
-    // If headers is 0, the HTTP call failed (timeout, DNS failure, etc.)
-    if (headers == 0) {
-      log(LogLevelValues.error, "HTTP call failed — no response received");
-      return;
-    }
-
-    const userAgent = stream_context.headers.http_callback.get("user-agent");
-    if (userAgent !== "") {
-      log(LogLevelValues.info, "User-Agent: " + userAgent);
-    }
-
-    if (body_size > 0) {
-      const bodyBytes = get_buffer_bytes(
-        BufferTypeValues.HttpCallResponseBody,
-        0,
-        body_size,
-      );
-      const bodyStr = String.UTF8.decode(bodyBytes);
-      log(LogLevelValues.info, "Response body (" + body_size.toString() + " bytes): " + bodyStr);
-    } else {
-      log(LogLevelValues.info, "Response body: empty");
-    }
-  }
 }
 
 class HttpCallContext extends Context {
-  httpCallDone: bool = false;
+  httpCallDispatched: bool = false;
 
   constructor(context_id: u32, root_context: HttpCallRoot) {
     super(context_id, root_context);
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    if (this.httpCallDone) {
-      log(LogLevelValues.info, "HTTP call response was received successfully, resuming request.");
+    // FastEdge re-invokes this hook after the httpCall response is processed.
+    // The latch gates re-dispatch so the second invocation returns Continue
+    // instead of firing another HTTP call. See SDK docs → Outbound HTTP.
+    if (this.httpCallDispatched) {
+      log(
+        LogLevelValues.info,
+        "HTTP call response received, resuming request.",
+      );
       return FilterHeadersStatusValues.Continue;
     }
 
@@ -90,7 +93,7 @@ class HttpCallContext extends Context {
       new Array<HeaderPair>(),
       1000,
       this,
-      (ctx: BaseContext, hdrs: u32, bodySize: usize, trls: u32): void => {},
+      handleHttpCallResponse,
     );
 
     if (result != WasmResultValues.Ok) {
@@ -107,10 +110,9 @@ class HttpCallContext extends Context {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    this.httpCallDone = true;
+    this.httpCallDispatched = true;
     log(LogLevelValues.info, "HTTP call dispatched, pausing request");
 
-    // Pause the request until the HTTP call response arrives
     return FilterHeadersStatusValues.StopIteration;
   }
 }

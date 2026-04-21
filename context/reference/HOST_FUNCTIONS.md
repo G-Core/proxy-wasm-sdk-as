@@ -56,8 +56,8 @@ All host functions are declared in `assembly/imports.ts` as `@external("env", "<
 
 | Function | Description |
 |----------|-------------|
-| `proxy_continue_stream(stream_type)` | Resume paused request or response |
-| `proxy_close_stream(stream_type)` | Close stream |
+| `proxy_continue_stream(stream_type)` | No-op on FastEdge. Canonical proxy-wasm uses this to resume a paused stream; the FastEdge runtime resumes implicitly by re-invoking the originating lifecycle hook after an HTTP call response. See `PROXY_WASM_LIFECYCLE.md` → Async HTTP Callbacks. `BaseContext.continueRequest()` wraps this call and is therefore ceremonial. |
+| `proxy_close_stream(stream_type)` | Abort the pause loop. When called during an async HTTP callback flow, the host exits the pause loop and returns a 503 response. This is the only guest-side mechanism to signal "stop processing" to FastEdge's host-driven resume loop. |
 | `proxy_send_local_response(code, details, body, headers, grpc_status)` | Send synthetic response |
 | `proxy_clear_route_cache()` | Clear Envoy route cache |
 
@@ -65,7 +65,7 @@ All host functions are declared in `assembly/imports.ts` as `@external("env", "<
 
 | Function | Description |
 |----------|-------------|
-| `proxy_http_call(uri, uri_size, headers, headers_size, body, body_size, trailers, trailers_size, timeout_ms, token_ptr)` | Make async HTTP request, returns token |
+| `proxy_http_call(uri, uri_size, headers, headers_size, body, body_size, trailers, trailers_size, timeout_ms, token_ptr)` | Make async HTTP request, returns token. Resume after the response is handled by the host re-invoking the originating lifecycle hook — see `PROXY_WASM_LIFECYCLE.md` → Async HTTP Callbacks. |
 
 ### Shared Data (CAS)
 

@@ -69,6 +69,7 @@ Each of the 17 examples in `examples/` is an independent package:
 examples/<name>/
 ├── package.json         ← SDK dependency + build scripts
 ├── asconfig.json        ← Compiler config with named outputs
+├── tsconfig.json        ← IDE/LSP config (not used by asc)
 ├── assembly/
 │   └── index.ts         ← Application code
 ├── README.md            ← Description, env vars, build instructions
@@ -95,6 +96,17 @@ examples/<name>/
     "@assemblyscript/wasi-shim": "^0.1.0",
     "assemblyscript": "^0.28.9"
   }
+}
+```
+
+### Example tsconfig.json Pattern
+
+Used only by the TypeScript language server for editor DX (it teaches IDEs about AssemblyScript's global types — `u32`, `bool`, `usize`, `String.UTF8`, etc.). It is NOT consumed by `asc`; the AssemblyScript compiler uses `asconfig.json`. Without it, IDEs flag AS-specific types as errors.
+
+```json
+{
+  "extends": "assemblyscript/std/assembly.json",
+  "include": ["./**/*.ts"]
 }
 ```
 
@@ -161,7 +173,7 @@ registerRootContext(
 
 ## Adding a New Example
 
-1. Create `examples/<name>/` with `package.json`, `asconfig.json`, `assembly/index.ts`, `README.md`
+1. Create `examples/<name>/` with `package.json`, `asconfig.json`, `tsconfig.json`, `assembly/index.ts`, `README.md`
 2. Follow the patterns above — use `^1.2.3` for the SDK dep (not `file:../..`)
 3. Add `[← Back to examples](../README.md)` as the first line of `README.md`
 4. Add the example to `examples/README.md` in the appropriate table (Getting Started or Full Examples)

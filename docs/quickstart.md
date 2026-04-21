@@ -45,6 +45,7 @@ my-cdn-app/
 ├── assembly/
 │   └── index.ts        # Your CDN app entry point
 ├── asconfig.json       # AssemblyScript build configuration
+├── tsconfig.json       # IDE/LSP type recognition (not used by the compiler)
 └── package.json
 ```
 
@@ -78,30 +79,30 @@ class HelloWorld extends Context {
 
   onRequestHeaders(
     headers: u32,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterHeadersStatusValues {
-    log(LogLevelValues.info, "onRequestHeaders >>");
+    log(LogLevelValues.info, "onRequestHeaders >> Hello World!");
     return FilterHeadersStatusValues.Continue;
   }
 
   onRequestBody(
     body_buffer_length: usize,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterDataStatusValues {
-    log(LogLevelValues.info, "onRequestBody >>");
+    log(LogLevelValues.info, "onRequestBody >> Hello World!");
     return FilterDataStatusValues.Continue;
   }
 
   onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    log(LogLevelValues.info, "onResponseHeaders >>");
+    log(LogLevelValues.info, "onResponseHeaders >> Hello World!");
     return FilterHeadersStatusValues.Continue;
   }
 
   onResponseBody(
     body_buffer_length: usize,
-    end_of_stream: bool
+    end_of_stream: bool,
   ): FilterDataStatusValues {
-    log(LogLevelValues.info, "onResponseBody >>");
+    log(LogLevelValues.info, "onResponseBody >> Hello World!");
     return FilterDataStatusValues.Continue;
   }
 }
@@ -113,24 +114,24 @@ registerRootContext((context_id: u32) => {
 
 ### What each part does
 
-| Part                                 | Purpose                                                                                                     |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `export * from ".../assembly/proxy"` | Exposes the wasm entry points the host runtime calls into. Required in every app.                           |
-| `RootContext` subclass               | Created once per worker; `createContext` produces a `Context` for each hook invocation.                     |
-| `Context` subclass                   | Handles a single lifecycle hook. A fresh instance is created for each hook phase,                           |
-|                                      | instance fields do not persist across hooks. See [Hook State Isolation](./SDK_API.md#hook-state-isolation). |
-| `registerRootContext`                | Registers your root context factory with the proxy runtime.                                                 |
+| Part                                  | Purpose                                                                                                     |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `export * from ".../assembly/proxy"`  | Exposes the wasm entry points the host runtime calls into. Required in every app.                           |
+| `RootContext` subclass                | Created once per worker; `createContext` produces a `Context` for each hook invocation.                     |
+| `Context` subclass                    | Handles a single lifecycle hook. A fresh instance is created for each hook phase,                           |
+|                                       | instance fields do not persist across hooks. See [Hook State Isolation](./SDK_API.md#hook-state-isolation). |
+| `registerRootContext`                 | Registers your root context factory with the proxy runtime.                                                 |
 
 ### Lifecycle hooks
 
 Override any of these methods on your `Context` subclass to intercept traffic:
 
-| Method                                                                                   | Called when                          |
-| ---------------------------------------------------------------------------------------- | ------------------------------------ |
-| `onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues`         | Inbound request headers arrive       |
-| `onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`  | Inbound request body chunk arrives   |
-| `onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues`              | Outbound response headers arrive     |
-| `onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues` | Outbound response body chunk arrives |
+| Method                                                                                    | Called when                          |
+| ----------------------------------------------------------------------------------------- | ------------------------------------ |
+| `onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues`          | Inbound request headers arrive       |
+| `onRequestBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`   | Inbound request body chunk arrives   |
+| `onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues`               | Outbound response headers arrive     |
+| `onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatusValues`  | Outbound response body chunk arrives |
 
 Return `FilterHeadersStatusValues.Continue` or `FilterDataStatusValues.Continue` to pass the data through unmodified.
 
@@ -202,15 +203,28 @@ Create `asconfig.json` in your project root:
 
 ### Configuration fields
 
-| Field                                    | Required | Description                                                                                    |
-| ---------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `extends` (wasi-shim)                    | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
-| `options.use: "abort=abort_proc_exit"`   | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps. |
-| `options.bindings: "esm"`               | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
-| `targets.release.outFile`               | Yes      | Path for the compiled release wasm binary.                                                     |
-| `targets.debug.outFile`                 | Yes      | Path for the debug wasm binary.                                                                |
+| Field                                   | Required | Description                                                                                    |
+| --------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `extends` (wasi-shim)                   | Yes      | Imports WASI shim configuration needed for AssemblyScript compatibility with the host runtime. |
+| `options.use: "abort=abort_proc_exit"`  | Yes      | Redirects AssemblyScript's built-in `abort` to a WASI-compatible exit. Required for all apps. |
+| `options.bindings: "esm"`              | Yes      | Generates ESM JavaScript bindings alongside the wasm binary.                                   |
+| `targets.release.outFile`              | Yes      | Path for the compiled release wasm binary.                                                     |
+| `targets.debug.outFile`                | Yes      | Path for the debug wasm binary.                                                                |
 
 The `"use": "abort=abort_proc_exit"` option is mandatory. Without it, unhandled aborts in AssemblyScript will not terminate the wasm module correctly on the FastEdge host.
+
+## IDE Configuration (tsconfig.json)
+
+Create `tsconfig.json` in your project root:
+
+```json
+{
+  "extends": "assemblyscript/std/assembly.json",
+  "include": ["./**/*.ts"]
+}
+```
+
+This file is consumed exclusively by your IDE or language server (VS Code, WebStorm, etc.) to recognise AssemblyScript-specific types such as `u32`, `bool`, `usize`, `i32`, and `f64`. Without it, editors flag these types as unknown TypeScript errors. The AssemblyScript compiler (`asc`) does not read `tsconfig.json` — build behaviour is controlled entirely by `asconfig.json`.
 
 ## Build
 

@@ -4,6 +4,12 @@
 
 The proxy-wasm ABI defines a host↔wasm contract. The host (FastEdge CDN proxy) calls exported wasm functions at specific lifecycle points. The SDK's `exports.ts` implements these entry points and dispatches to user-defined `RootContext` and `Context` subclasses.
 
+> **FastEdge vs canonical proxy-wasm:** this SDK targets the FastEdge CDN runtime, which differs from canonical Envoy proxy-wasm in two ways that directly affect guest code:
+> 1. **Hook state isolation** — Context instances do not persist across different lifecycle hooks (covered in `SDK_ARCHITECTURE.md` → Hook State Isolation).
+> 2. **HTTP call resume model** — after an outbound `httpCall` response, the runtime re-invokes the originating hook rather than continuing the stream at the next phase (covered in "Async HTTP Callbacks" below).
+>
+> Guest code written against generic proxy-wasm tutorials will not work correctly on FastEdge without accounting for both.
+
 ---
 
 ## VM Lifecycle
@@ -96,33 +102,77 @@ proxy_on_delete(context_id)
 
 ## Async HTTP Callbacks
 
-When `RootContext.httpCall()` makes an async HTTP request:
+The FastEdge runtime uses a **host-driven resume model** for outbound HTTP calls. This is not canonical proxy-wasm behavior and is load-bearing for correctness.
 
-1. The current request is paused
-2. When the response arrives, the host calls:
+### Dispatch and Resume Flow
 
-```
-proxy_on_http_call_response(context_id, token, headers, body_size, trailers)
-  → RootContext.onHttpCallResponse(token, headers, body_size, trailers)
-  → Or the callback passed to httpCall()
-```
+1. A lifecycle hook (typically `onRequestHeaders`) calls `httpCall(cluster, headers, body, trailers, timeout_ms, origin_context, cb)` on the `RootContext`. The SDK stores `cb` keyed by an HTTP call token in `root_context.http_calls_`.
+2. The hook returns a pause value (`FilterHeadersStatusValues.StopIteration` or similar).
+3. The host awaits the HTTP response.
+4. On response, the host invokes `proxy_on_http_call_response(context_id, token, headers, body_size, trailers)`. The SDK's base `RootContext.onHttpCallResponse`:
+   - Looks up the stored callback by token.
+   - Calls `proxy_set_effective_context(origin_context.context_id)` so that `stream_context.headers.http_callback.get(...)` and `get_buffer_bytes(HttpCallResponseBody, ...)` resolve against the originating request's scope.
+   - Invokes `cb(origin_context, headers, body_size, trailers)`.
+5. **The host then re-invokes the same lifecycle hook** (e.g. `onRequestHeaders`) on the same `Context` instance.
+6. The hook must return `Continue` to proceed, or it can dispatch another call and return a pause value again.
 
-The `httpCall` method accepts a callback function:
+### Required Pattern: Latch Field + Named Callback
+
+Because step 5 re-fires the same hook, every hook that dispatches `httpCall` must guard re-dispatch with an instance-field latch. Without it, the hook dispatches a new HTTP call on every re-entry and the request loops until timeout.
+
+Prefer a named module-level function for the `cb` argument over an anonymous arrow. Named functions cannot close over mutable state, which is structurally safer under AssemblyScript's closure restrictions and keeps the dispatch call site readable.
 
 ```typescript
-this.httpCall(
-  "cluster_name",
-  headers,
-  body,
-  trailers,
-  timeout_ms,
-  this,                    // origin context
-  (ctx, hdrs, body, trl) => {
-    // handle response
-    ctx.continueRequest(); // resume original request
+function onUpstreamResponse(
+  ctx: BaseContext,
+  hdrs: u32,
+  bodySize: usize,
+  trls: u32,
+): void {
+  // Read response via stream_context.headers.http_callback
+  // and get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, ...).
+  // Downcast `ctx as MyContext` if Context state is needed.
+}
+
+class MyContext extends Context {
+  httpCallDispatched: bool = false;
+
+  onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
+    if (this.httpCallDispatched) {
+      return FilterHeadersStatusValues.Continue;
+    }
+
+    const result = (this.root_context as MyRoot).httpCall(
+      "example.com",
+      headers,
+      new ArrayBuffer(0),
+      [],
+      1000,
+      this,
+      onUpstreamResponse,
+    );
+    if (result != WasmResultValues.Ok) { /* handle dispatch failure */ }
+
+    this.httpCallDispatched = true;
+    return FilterHeadersStatusValues.StopIteration;
   }
-);
+}
 ```
+
+### Interaction with Hook State Isolation
+
+Instance fields on a `Context` do **not** persist across different lifecycle hooks (e.g. `onRequestHeaders` → `onResponseHeaders` run on different servers — see `SDK_ARCHITECTURE.md` → Hook State Isolation). They **do** persist across the re-invocation in step 5 because it is the same hook on the same `Context` within a single wasm invocation chain. The latch pattern above depends on this narrower guarantee.
+
+If you need state to survive across hooks (e.g. remember in `onResponseHeaders` that an HTTP call happened during `onRequestHeaders`), use `set_property` / `get_property`.
+
+### `continueRequest()` is Ceremonial
+
+`BaseContext.continueRequest()` wraps `proxy_continue_stream`, which is a no-op on the FastEdge runtime. Resume is implicit via hook re-invocation; calling `continueRequest()` has no observable effect. The only guest-side signal that affects the pause loop is `proxy_close_stream`, which aborts with 503.
+
+### Override Patterns to Avoid
+
+- **Do not override `RootContext.onHttpCallResponse`** unless you also call `super.onHttpCallResponse(token, headers, body_size, trailers)`. Overriding without `super` skips the token→callback lookup and `setEffectiveContext` call, breaking the per-Context response routing the SDK provides.
+- **Do not mirror `Context`-level `on_http_call_response` overrides from the Rust SDK** — the AS SDK dispatches `proxy_on_http_call_response` to the singleton root, not to per-request contexts. Use the `cb` argument to `httpCall` to reach per-Context logic.
 
 ---
 
