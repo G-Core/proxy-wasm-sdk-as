@@ -103,7 +103,15 @@ class ErrorPagesContext extends Context {
       "</div></body></html>";
 
     const body = String.UTF8.encode(html);
-    set_buffer_bytes(BufferTypeValues.HttpResponseBody, 0, body.byteLength, body);
+    // Replace the entire original body — pass body_buffer_length as the length
+    // to replace, not body.byteLength. Otherwise any original bytes beyond the
+    // new body's length survive at the tail of the response.
+    set_buffer_bytes(
+      BufferTypeValues.HttpResponseBody,
+      0,
+      body_buffer_length as u32,
+      body,
+    );
 
     return FilterDataStatusValues.Continue;
   }
