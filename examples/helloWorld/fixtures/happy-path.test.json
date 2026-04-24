@@ -9,12 +9,6 @@
     },
     "body": ""
   },
-  "response": {
-    "headers": {
-      "content-type": "text/html"
-    },
-    "body": "<html><body>Hello World</body></html>"
-  },
   "logLevel": 2,
   "wasm": {
     "path": "<workspace>/.fastedge-debug/app.wasm",

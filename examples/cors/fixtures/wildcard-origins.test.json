@@ -10,15 +10,9 @@
     },
     "body": ""
   },
-  "response": {
-    "headers": {
-      "content-type": "application/json"
-    },
-    "body": "{\"public\": true}"
-  },
   "dotenv": {
     "enabled": true,
-    "path": "fixtures/wildcard.env"
+    "path": "wildcard/"
   },
   "logLevel": 2,
   "wasm": {

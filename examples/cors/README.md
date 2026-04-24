@@ -2,13 +2,13 @@
 
 # CORS
 
-This application adds Cross-Origin Resource Sharing (CORS) headers to responses and handles preflight OPTIONS requests.
+This application adds Cross-Origin Resource Sharing (CORS) headers to responses from allowed origins.
 
 ## What it does
 
-In `onRequestHeaders`, the app checks the `Origin` request header against a configurable allow-list. If the request is an OPTIONS preflight, it responds immediately with CORS headers (204 No Content) and stops the pipeline.
+In `onResponseHeaders`, for requests from allowed origins, the app adds `Access-Control-Allow-Origin` and `Vary: Origin` response headers. Optionally exposes additional headers via `Access-Control-Expose-Headers`. Requests from disallowed origins pass through unchanged (no CORS headers added).
 
-In `onResponseHeaders`, for non-preflight requests from allowed origins, the app adds `Access-Control-Allow-Origin` and `Vary: Origin` response headers. Optionally exposes additional headers via `Access-Control-Expose-Headers`.
+> **Note on OPTIONS preflights:** FastEdge's edge layer answers OPTIONS preflight requests directly — proxy-wasm hooks do not fire for OPTIONS. Configure preflight behaviour (allowed methods, max-age, etc.) in your CDN application settings, not in WASM code.
 
 ## Configuration
 
@@ -17,8 +17,6 @@ Set the following environment variables on your FastEdge application:
 | Variable | Example | Description |
 |----------|---------|-------------|
 | `ALLOWED_ORIGINS` | `https://example.com,https://app.example.com` | Comma-separated allowed origins, or `*` for any (required) |
-| `ALLOWED_METHODS` | `GET, POST, PUT, DELETE, OPTIONS` | Methods for preflight (optional, defaults shown) |
-| `MAX_AGE` | `86400` | Preflight cache duration in seconds (optional, default `86400`) |
 | `EXPOSE_HEADERS` | `X-Request-Id, X-Trace-Id` | Response headers to expose to the browser (optional) |
 
 ## Build

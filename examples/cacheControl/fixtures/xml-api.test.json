@@ -5,13 +5,9 @@
     "method": "GET",
     "url": "http://fastedge-builtin.debug/api/feed",
     "headers": {
-      "host": "api.example.com"
-    },
-    "body": ""
-  },
-  "response": {
-    "headers": {
-      "content-type": "application/xml"
+      "host": "api.example.com",
+      "content-type": "application/xml",
+      "x-debugger-content": "body-only"
     },
     "body": "<feed><entry>test</entry></feed>"
   },

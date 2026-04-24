@@ -10,12 +10,6 @@
     },
     "body": ""
   },
-  "response": {
-    "headers": {
-      "content-type": "application/json"
-    },
-    "body": "{\"status\": \"ok\"}"
-  },
   "dotenv": {
     "enabled": true,
     "path": "."

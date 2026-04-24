@@ -5,15 +5,11 @@
     "method": "GET",
     "url": "http://fastedge-builtin.debug/api/data",
     "headers": {
-      "host": "api.example.com"
+      "host": "api.example.com",
+      "content-type": "application/json",
+      "x-debugger-content": "body-only"
     },
-    "body": ""
-  },
-  "response": {
-    "headers": {
-      "content-type": "application/json"
-    },
-    "body": "{\"items\": []}"
+    "body": "{\"items\":[]}"
   },
   "dotenv": {
     "enabled": true,

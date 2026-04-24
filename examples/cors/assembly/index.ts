@@ -2,13 +2,10 @@ export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy";
 import {
   Context,
   FilterHeadersStatusValues,
-  HeaderPair,
   log,
   LogLevelValues,
-  makeHeaderPair,
   registerRootContext,
   RootContext,
-  send_http_response,
   stream_context,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 import {
@@ -31,6 +28,10 @@ class CorsContext extends Context {
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     const allowedOrigins = getEnv("ALLOWED_ORIGINS");
     const origin = stream_context.headers.request.get("Origin");
+    log(
+      LogLevelValues.info,
+      "Farq: -> CorsContext -> onRequestHeaders -> origin: " + origin,
+    );
 
     if (origin === "") {
       return FilterHeadersStatusValues.Continue;
@@ -52,35 +53,8 @@ class CorsContext extends Context {
       }
     }
 
-    const method = stream_context.headers.request.get(":method");
-
-    // Handle preflight OPTIONS request
-    if (method == "OPTIONS") {
-      const requestMethod = stream_context.headers.request.get(
-        "Access-Control-Request-Method",
-      );
-      const requestHeaders = stream_context.headers.request.get(
-        "Access-Control-Request-Headers",
-      );
-
-      const allowMethods =
-        getEnv("ALLOWED_METHODS") || "GET, POST, PUT, DELETE, OPTIONS";
-      const allowHeaders =
-        requestHeaders !== "" ? requestHeaders : "Content-Type, Authorization";
-      const maxAge = getEnv("MAX_AGE") || "86400";
-
-      const responseHeaders = new Array<HeaderPair>();
-      responseHeaders.push(makeHeaderPair("Access-Control-Allow-Origin", origin));
-      responseHeaders.push(makeHeaderPair("Access-Control-Allow-Methods", allowMethods));
-      responseHeaders.push(makeHeaderPair("Access-Control-Allow-Headers", allowHeaders));
-      responseHeaders.push(makeHeaderPair("Access-Control-Max-Age", maxAge));
-      responseHeaders.push(makeHeaderPair("Content-Length", "0"));
-
-      send_http_response(204, "", new ArrayBuffer(0), responseHeaders);
-
-      log(LogLevelValues.info, "CORS: preflight response for " + origin);
-      return FilterHeadersStatusValues.StopIteration;
-    }
+    // OPTIONS preflights are answered by the FastEdge edge layer before this
+    // hook fires — don't try to handle them here.
 
     return FilterHeadersStatusValues.Continue;
   }

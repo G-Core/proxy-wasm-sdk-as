@@ -9,10 +9,6 @@
     },
     "body": ""
   },
-  "response": {
-    "headers": {},
-    "body": ""
-  },
   "logLevel": 2,
   "wasm": {
     "path": "<workspace>/.fastedge-debug/app.wasm",

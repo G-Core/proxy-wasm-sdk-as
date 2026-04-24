@@ -10,12 +10,6 @@
     },
     "body": ""
   },
-  "response": {
-    "headers": {
-      "content-type": "text/html"
-    },
-    "body": "<html><body>Internal Server Error</body></html>"
-  },
   "dotenv": {
     "enabled": true,
     "path": "."

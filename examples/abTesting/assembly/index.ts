@@ -15,9 +15,7 @@ import {
   getEnv,
   setLogLevel,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
-import {
-  getCurrentTime,
-} from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge/utils/runtime";
+import { getCurrentTime } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge/utils/runtime";
 
 class AbTestingRoot extends RootContext {
   createContext(context_id: u32): Context {
@@ -27,8 +25,6 @@ class AbTestingRoot extends RootContext {
 }
 
 class AbTestingContext extends Context {
-  private variant: string = "";
-
   constructor(context_id: u32, root_context: AbTestingRoot) {
     super(context_id, root_context);
   }
@@ -71,8 +67,6 @@ class AbTestingContext extends Context {
       assignedVariant = now % 2 == 0 ? "A" : "B";
     }
 
-    this.variant = assignedVariant;
-
     // Rewrite the request path to the variant path
     const pathArrBuf = get_property("request.path");
     if (pathArrBuf.byteLength === 0) {
@@ -80,19 +74,25 @@ class AbTestingContext extends Context {
     }
     const originalPath = String.UTF8.decode(pathArrBuf);
     const variantPath = assignedVariant === "A" ? variantAPath : variantBPath;
-    // Prepend variant path prefix to the original path
     const newPath = variantPath + originalPath;
 
-    const urlArrBuf = get_property("request.url");
-    if (urlArrBuf.byteLength > 0) {
-      const url = String.UTF8.decode(urlArrBuf);
-      // Replace the path portion in the full URL
-      const pathIdx = url.indexOf(originalPath);
-      if (pathIdx >= 0) {
-        const newUrl =
-          url.substring(0, pathIdx) + newPath + url.substring(pathIdx + originalPath.length);
-        set_property("request.url", String.UTF8.encode(newUrl));
-      }
+    // Reconstruct request.url from its decomposed parts rather than splicing
+    // the path out of the full URL — splicing breaks when the path happens to
+    // appear inside the host, and it can silently lose the query string.
+    const schemeBuf = get_property("request.scheme");
+    const hostBuf = get_property("request.host");
+    if (schemeBuf.byteLength > 0 && hostBuf.byteLength > 0) {
+      const scheme = String.UTF8.decode(schemeBuf);
+      const host = String.UTF8.decode(hostBuf);
+      const queryBuf = get_property("request.query");
+      const query = queryBuf.byteLength > 0 ? String.UTF8.decode(queryBuf) : "";
+      const newUrl =
+        scheme + "://" + host + newPath + (query.length > 0 ? "?" + query : "");
+      log(
+        LogLevelValues.info,
+        `Farq: -> AbTestingContext -> onRequestHeaders -> newUrl: ${newUrl}`,
+      );
+      set_property("request.url", String.UTF8.encode(newUrl));
     }
 
     // Add variant header for upstream visibility
@@ -108,7 +108,10 @@ class AbTestingContext extends Context {
   }
 
   onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    if (this.variant === "") {
+    // Recover the assigned variant from the request header set in onRequestHeaders.
+    // Instance state (this.variant) does not survive the nginx -> core-proxy hop.
+    const variant = stream_context.headers.request.get("X-Variant");
+    if (variant === "") {
       return FilterHeadersStatusValues.Continue;
     }
 
@@ -118,14 +121,11 @@ class AbTestingContext extends Context {
     // Set the experiment cookie so subsequent requests stick to the same variant
     stream_context.headers.response.add(
       "Set-Cookie",
-      cookieName +
-        "=" +
-        this.variant +
-        "; Path=/; Max-Age=86400; SameSite=Lax",
+      cookieName + "=" + variant + "; Path=/; Max-Age=86400; SameSite=Lax",
     );
 
     // Add variant as response header for observability
-    stream_context.headers.response.add("X-Variant", this.variant);
+    stream_context.headers.response.add("X-Variant", variant);
 
     return FilterHeadersStatusValues.Continue;
   }
