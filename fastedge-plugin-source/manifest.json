@@ -9,6 +9,12 @@
       "description": "Complete SDK API — proxy-wasm lifecycle, RootContext/Context, lifecycle hooks, enums, stream_context, FastEdge host APIs (dictionary, secrets, KV store, utils)"
     },
 
+    "quickstart": {
+      "files": ["docs/quickstart.md"],
+      "required": true,
+      "description": "Installation, project setup, first CDN app, asconfig.json + tsconfig.json, basic build"
+    },
+
     "cdn-hello-world-blueprint": {
       "files": [
         "examples/helloWorld/assembly/index.ts",
@@ -318,6 +324,11 @@
   "target_mapping": {
     "sdk-api": {
       "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/sdk-reference-as.md",
+      "section": null
+    },
+
+    "quickstart": {
+      "reference_file": "plugins/gcore-fastedge/skills/fastedge-docs/reference/quickstart-as.md",
       "section": null
     },
 
