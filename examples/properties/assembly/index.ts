@@ -34,14 +34,29 @@ class Properties extends Context {
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
+    // allowEmpty=true is for properties that may legitimately be absent on
+    // some requests (e.g. request.extension when the path has no file
+    // extension, request.query when the path has no query string). In that
+    // case we log the property with an empty value and continue, without
+    // adding an empty response header.
     function handleProperty(
       propertyKey: string,
       errorCode: u32,
-      propertyName?: string,
-      headerName?: string
+      propertyName: string = "",
+      headerName: string = "",
+      allowEmpty: boolean = false
     ): boolean {
       const valueArr = get_property(propertyKey);
       if (valueArr.byteLength === 0) {
+        if (allowEmpty) {
+          if (propertyName.length > 0) {
+            log(
+              LogLevelValues.info,
+              "onRequestHeaders >> " + propertyName + ": "
+            );
+          }
+          return true;
+        }
         send_http_response(
           errorCode,
           "internal server error",
@@ -51,13 +66,13 @@ class Properties extends Context {
         return false;
       }
       const value = String.UTF8.decode(valueArr);
-      if (propertyName) {
+      if (propertyName.length > 0) {
         log(
           LogLevelValues.info,
           "onRequestHeaders >> " + propertyName + ": " + value
         );
       }
-      if (headerName) {
+      if (headerName.length > 0) {
         stream_context.headers.response.add(headerName, value);
       }
       return true;
@@ -80,12 +95,20 @@ class Properties extends Context {
     }
 
     if (
-      !handleProperty(REQUEST_EXTENSION, 555, "extension", "request-extension")
+      !handleProperty(
+        REQUEST_EXTENSION,
+        555,
+        "extension",
+        "request-extension",
+        true
+      )
     ) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_QUERY, 556, "query", "request-query")) {
+    if (
+      !handleProperty(REQUEST_QUERY, 556, "query", "request-query", true)
+    ) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
