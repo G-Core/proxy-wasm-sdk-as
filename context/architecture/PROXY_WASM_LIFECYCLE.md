@@ -88,6 +88,11 @@ proxy_on_log(context_id)
   → Context.onLog()
   → Called after response complete
   → Headers/body readable but immutable
+  → NOTE: Not dispatched on FastEdge today. The hook is part of the
+    proxy-wasm spec and the SDK still exports it for forward-compat,
+    but neither the FastEdge edge runtime nor the local debugger
+    (`@gcoredev/fastedge-test`) invokes it. Do not rely on `onLog`
+    firing in examples or in production code.
 
 proxy_on_done(context_id)
   → Context.onDone() or RootContext.onDone()

@@ -42,11 +42,13 @@ BaseContext (abstract)
     ├── onResponseHeaders()   → FilterHeadersStatusValues
     ├── onResponseBody()      → FilterDataStatusValues
     ├── onResponseTrailers()  → FilterTrailersStatusValues
-    ├── onLog()               ← After response complete
+    ├── onLog()               ← After response complete (NOT dispatched on FastEdge today — see note below)
     └── onNewConnection()     ← TCP filter (rare)
 ```
 
 Users extend both classes, override the hooks they need, and return status values to control request flow (Continue, StopIteration, etc.).
+
+**`onLog()` is currently dead code on FastEdge.** The hook is part of the proxy-wasm spec and the SDK still exports the `proxy_on_log` symbol for forward-compat, but neither the FastEdge edge runtime nor the local debugger (`@gcoredev/fastedge-test`) invokes it. Do not implement `onLog` in new examples or production code — use the existing four phase hooks (`onRequest*`, `onResponse*`) for end-of-request logging instead.
 
 ### Registration Pattern
 

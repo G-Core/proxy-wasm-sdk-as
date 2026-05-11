@@ -40,13 +40,6 @@ class LogTime extends Context {
     );
     return FilterHeadersStatusValues.Continue;
   }
-
-  onLog(): void {
-    log(
-      LogLevelValues.info,
-      "onLog >> completed (contextId): " + this.context_id.toString()
-    );
-  }
 }
 
 registerRootContext((context_id: u32) => {
