@@ -2,6 +2,24 @@
 
 Use `grep` to search this file — do not read linearly as it grows.
 
+## [2026-05-12] — Symmetric set-equality in `examples/headers` diff (parity)
+
+### Overview
+AS port of the same fix landing in FastEdge-sdk-rust today. The strict diff in `examples/headers/assembly/index.ts` only flagged extras (`new-header-*` entries in actual but not in expected); a WASM that *failed* to add an expected header was never iterated and `diff.size > 0` didn't fire, so the 552 branch silently passed on a real regression. Refactored `validateHeaders` to return both `missing` and `extra` via a `HeaderDiff` class, preserving the deliberate `new-header-` prefix scoping that lets application-style headers (e.g. set-cookie) tag along without being enumerated in `expected`. fastedge-test ported the same change into its in-repo `as/cdn-headers/assembly/headers.ts`.
+
+### Decisions
+- New `HeaderDiff` class with `missing: Set<string>` and `extra: Set<string>` fields (constructor-initialised because AS's class-field initialisers don't reliably handle `new Set<string>()`). Single-pass `validateHeaders`: walks actual headers once to populate `extra` and `actualNewHeaders`, then walks `expectedHeaders` once to populate `missing`.
+- Preserved the `new-header-` prefix gate so the AS strict-validation app continues to tolerate unrelated added headers without enumerating them. Without the gate, set-cookie additions in the response phase would trip the diff.
+- Call sites in both hooks now trigger 552 when `diff.missing.size > 0 || diff.extra.size > 0` and log both for diagnosability.
+
+### Changes
+- `examples/headers/assembly/index.ts` — `HeaderDiff` class added; `validateHeaders` refactored to compute both directions; `onRequestHeaders` and `onResponseHeaders` call sites updated. `pnpm run asbuild:release` clean.
+
+### Docgen pipeline tooling
+- `fastedge-plugin-source/generate-docs.sh` + `.gitignore` — parity port of the `docs/.failures/` capture + preamble-salvage mechanism from the `fastedge-plugin` `generate-docs-template.sh` source-of-truth (see that repo's commit for the full rationale). Sonnet's intermittent "outputting verbatim" preamble leak in Update mode is now stripped on-the-fly rather than triggering a retry.
+
+---
+
 ## [2026-04-21] — Backfilled tsconfig.json Across Examples
 
 ### Overview
