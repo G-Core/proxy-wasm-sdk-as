@@ -1,0 +1,11 @@
+{
+  "expected": {
+    "logs": [
+      "#header -> "
+    ],
+    "headers": {
+      "new-header-02": "new-value-02",
+      "new-header-03": "value-03"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> Hello World!",
+      "onRequestBody >> Hello World!",
+      "onResponseHeaders >> Hello World!",
+      "onResponseBody >> Hello World!"
+    ]
+  }
+}

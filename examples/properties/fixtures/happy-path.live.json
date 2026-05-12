@@ -1,0 +1,7 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> "
+    ]
+  }
+}
