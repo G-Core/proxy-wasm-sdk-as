@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "Error response detected: 400"
+    ],
+    "status": 400,
+    "contentType": "text/html",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    },
+    "bodyContains": [
+      "<title>400 — Bad Request</title>",
+      "<p class='code'>400</p>",
+      "<h1 class='title'>Bad Request</h1>",
+      "<p class='desc'>The server could not understand the request due to invalid syntax.</p>",
+      "<p class='category'>Client Error</p>"
+    ]
+  }
+}

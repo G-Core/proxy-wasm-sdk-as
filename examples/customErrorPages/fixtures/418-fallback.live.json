@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "Error response detected: 418"
+    ],
+    "status": 418,
+    "contentType": "text/html",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    },
+    "bodyContains": [
+      "<title>418 — Error</title>",
+      "<p class='code'>418</p>",
+      "<h1 class='title'>Error</h1>",
+      "<p class='desc'>An error occurred processing your request.</p>",
+      "<p class='category'>Client Error</p>"
+    ]
+  }
+}

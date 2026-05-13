@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "Error response detected: 404"
+    ],
+    "status": 404,
+    "contentType": "text/html",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    },
+    "bodyContains": [
+      "<title>404 — Not Found</title>",
+      "<p class='code'>404</p>",
+      "<h1 class='title'>Not Found</h1>",
+      "<p class='desc'>The requested page could not be found. It may have been moved or deleted.</p>",
+      "<p class='category'>Client Error</p>"
+    ]
+  }
+}

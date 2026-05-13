@@ -1,0 +1,14 @@
+{
+  "expected": {
+    "logs": [
+      "Farq: -> CorsContext -> onRequestHeaders -> origin: https://app.example.com"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "headers": {
+      "access-control-allow-origin": "https://app.example.com",
+      "vary": "Origin",
+      "access-control-expose-headers": "X-Request-Id, X-RateLimit-Remaining"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "expected": {
+    "logs": [
+      "LARGE_CONFIG size: 109 bytes"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "bodyContains": [
+      "\"x-config-size\":\"109\""
+    ]
+  }
+}

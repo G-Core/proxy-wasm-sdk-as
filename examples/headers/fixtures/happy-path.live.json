@@ -1,11 +1,14 @@
 {
   "expected": {
     "logs": [
-      "#header -> "
+      "#header -> host: example.com",
+      "#header -> new-response-header: value-02"
     ],
     "headers": {
+      "new-header-01": "",
       "new-header-02": "new-value-02",
-      "new-header-03": "value-03"
+      "new-header-03": ["value-03", "value-03-a"],
+      "new-response-header": "value-02"
     }
   }
 }

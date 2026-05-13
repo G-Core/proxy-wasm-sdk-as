@@ -1,0 +1,9 @@
+{
+  "expected": {
+    "logs": [
+      "API key validation failed"
+    ],
+    "status": 403,
+    "body": "Invalid API key"
+  }
+}

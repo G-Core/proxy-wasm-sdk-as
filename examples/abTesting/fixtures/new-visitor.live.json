@@ -1,0 +1,14 @@
+{
+  "expected": {
+    "logs": [
+      "A/B test \"homepage-hero\": variant ",
+      "Farq: -> AbTestingContext -> onRequestHeaders -> newUrl: http://example.com/"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "bodyContains": [
+      "\"x-experiment\":\"homepage-hero\"",
+      "\"x-variant\":\""
+    ]
+  }
+}

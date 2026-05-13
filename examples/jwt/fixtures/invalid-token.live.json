@@ -1,0 +1,9 @@
+{
+  "expected": {
+    "logs": [
+      "Bad Token"
+    ],
+    "status": 403,
+    "body": "Invalid token"
+  }
+}

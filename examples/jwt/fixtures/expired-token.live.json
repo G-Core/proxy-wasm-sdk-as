@@ -1,0 +1,9 @@
+{
+  "expected": {
+    "logs": [
+      "Token Expired"
+    ],
+    "status": 403,
+    "body": "Expired token"
+  }
+}

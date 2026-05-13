@@ -1,0 +1,16 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Missing Authorization header — returns 401",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "api.example.com"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  }
+}

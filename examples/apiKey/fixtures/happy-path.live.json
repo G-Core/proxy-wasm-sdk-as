@@ -1,0 +1,12 @@
+{
+  "expected": {
+    "logs": [
+      "API key validated successfully"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "bodyContains": [
+      "\"host\":\"api.example.com\""
+    ]
+  }
+}
