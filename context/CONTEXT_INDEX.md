@@ -37,6 +37,7 @@
 | `PROJECT_OVERVIEW.md` | ~120 | Lightweight overview — repo structure, modules, dependencies, setup. Read when new to the codebase. |
 | `reference/HOST_FUNCTIONS.md` | ~160 | Complete host function reference — all `proxy_*` imports, FastEdge-specific APIs, result codes, header serialization format. Read when adding or debugging host calls. |
 | `CHANGELOG.md` | ~0 | Agent decision log. Use grep as this file grows. |
+| `EXAMPLE_VALIDATION.md` | — | Pre-merge validation tracker for examples on `feature/more-examples-httpbin`. Read first when working on example validation, code review, or README polish. |
 
 ### Consumer Documentation (`docs/` — generated, not hand-edited)
 
@@ -98,6 +99,11 @@ Contract directory consumed by the fastedge-plugin sync pipeline. Contains `mani
 ### Adding an Example
 1. Browse `examples/helloWorld/` for the template
 2. Read `development/BUILD_AND_EXAMPLES.md` (adding new examples section)
+
+### Validating Examples for Merge (feature/more-examples-httpbin)
+1. Read `EXAMPLE_VALIDATION.md` (tracker — pick a `⬜ pending` row)
+2. Follow its Validation Checklist (build, local fixtures, code review, README review)
+3. Append a log entry to that example's section and update the row
 
 ### Updating Consumer Docs (`docs/`)
 1. Read `fastedge-plugin-source/.generation-config.md` — this drives all generation
