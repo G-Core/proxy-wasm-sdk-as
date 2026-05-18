@@ -194,12 +194,13 @@ onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatus
 onLog(): void
 ```
 
+`onLog` is part of the proxy-wasm specification, and the SDK exports `proxy_on_log` for forward compatibility. **`onLog` is not dispatched on the FastEdge platform today** — neither the edge runtime nor the local test runner invokes it. Do not implement `onLog` in application code or rely on it for any logic.
+
 **Hook parameter notes:**
 
 - `headers` / `a` in header hooks is the count of headers; it is rarely needed directly since `stream_context` provides header access.
 - `body_buffer_length` is the number of bytes buffered so far. Pass it to `get_buffer_bytes` to read the body.
 - `end_of_stream` indicates whether this is the final chunk.
-- `onLog` is called after the request/response cycle is complete; request and response headers are immutable in this phase.
 
 **Critical constraint**: Response headers (`stream_context.headers.response`) are only accessible during response-phase hooks (`onResponseHeaders`, `onResponseBody`). Accessing them during request-phase hooks will panic.
 
@@ -248,7 +249,7 @@ class MyContext extends Context {
 
 ### Hook State Isolation
 
-On the FastEdge CDN platform, **a `Context` instance only exists for the duration of a single lifecycle hook invocation**. It is re-created fresh for each hook. Different hooks may execute on entirely different servers: `onRequestHeaders` runs in nginx, while `onRequestBody`, `onResponseHeaders`, `onResponseBody`, and `onLog` run in core-proxy.
+On the FastEdge CDN platform, **a `Context` instance only exists for the duration of a single lifecycle hook invocation**. It is re-created fresh for each hook. Different hooks may execute on entirely different servers: `onRequestHeaders` runs in nginx, while `onRequestBody`, `onResponseHeaders`, and `onResponseBody` run in core-proxy.
 
 This means:
 
@@ -688,15 +689,15 @@ class RootContext {
 
 **Parameters:**
 
-| Parameter              | Type                                                                                    | Description                                                                                                              |
-| ---------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `cluster`              | `string`                                                                                | The upstream host to call. Must be a public host.                                                                        |
-| `headers`              | `Headers`                                                                               | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
-| `body`                 | `ArrayBuffer`                                                                           | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
-| `trailers`             | `Headers`                                                                               | Request trailers. Pass `[]` if none.                                                                                     |
-| `timeout_milliseconds` | `u32`                                                                                   | Request timeout in milliseconds.                                                                                         |
-| `origin_context`       | `BaseContext`                                                                           | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
-| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void`  | Callback invoked when the response is received.                                                                          |
+| Parameter              | Type                                                                                   | Description                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster`              | `string`                                                                               | The upstream host to call. Must be a public host.                                                                        |
+| `headers`              | `Headers`                                                                              | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
+| `body`                 | `ArrayBuffer`                                                                          | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
+| `trailers`             | `Headers`                                                                              | Request trailers. Pass `[]` if none.                                                                                     |
+| `timeout_milliseconds` | `u32`                                                                                  | Request timeout in milliseconds.                                                                                         |
+| `origin_context`       | `BaseContext`                                                                          | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
+| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void` | Callback invoked when the response is received.                                                                          |
 
 In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`. If `headers == 0`, the call failed (timeout or DNS failure).
 

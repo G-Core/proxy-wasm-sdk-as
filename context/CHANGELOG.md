@@ -2,6 +2,32 @@
 
 Use `grep` to search this file — do not read linearly as it grows.
 
+## [2026-05-13] — CC-04 resolved: production `.replace()` is UPSERT
+
+### Overview
+Verified on live FastEdge edge (resource 2296532, cname `cdn.godronus.xyz`) that `stream_context.headers.response.replace(name, value)` adds the header when it does not pre-exist — production matches the fastedge-test runner. The `headers` example's source comment at ~line 130 (*"cannot replace a header that does not exist"*) is therefore **wrong/outdated**.
+
+### Decisions
+- The disambiguating probe was `cacheControl`'s error-status branch: wasm wrote `Cache-Control: no-store` on a 404 response from httpbin (which sets no Cache-Control). Response showed `Cache-Control: no-store` with exact byte-for-byte value match. Appeared only after propagation completed (warmups 1–3 absent, warmup 4 present). Cache-Control has no protocol-level auto-set path, so the wasm is the only possible source.
+- The `body` probe alone was ambiguous: observed `Transfer-Encoding: chunked` (lowercase value) on HTTP/1.1, no transfer-encoding on HTTP/2. Both consistent with either upsert (CDN normalizes the wasm's `"Chunked"` to RFC-canonical lowercase) or strict no-op (CDN auto-frames as chunked because wasm `.remove("content-length")` succeeded). Cache-Control disambiguated.
+- Three prior "real bug" findings flipped to non-bugs: `body` B-C1, `cacheControl` CC-C1 (4 call sites), `customErrorPages` CEP-C1. No code changes needed in any of these examples.
+- The `headers` example's `.get().length > 0` guard pattern (HE-C3) is defensive but not required for correctness. Keep the pattern as a teaching point but remove the inline comment that claimed it was necessary.
+
+### Live infrastructure left in place
+- App `body` (id 806551), CDN rule `/livetest-body/` (id 22024943) — all four hook phases wired to resource 2296532.
+- App `cache-control` (id 806553), CDN rule `/livetest-cache-control/` (id 22024945) — only `on_response_headers` wired.
+- Debug windows close 30 min after the most recent PATCH. Re-run the live-test skill to refresh, or PATCH `active:false` on the rules to disable.
+
+### Side findings
+- `proxy-wasm-sdk-as/.gitignore` has a typo: `examples/**/livetest.cog.json` should be `livetest.config.json`. Currently `body/fixtures/livetest.config.json` is tracked-eligible.
+- The 2 `.live.json` files in `examples/body/fixtures/` were authored against the local debugger's echo behavior — their `body`, `contentType`, and several `logs` substrings won't pass against an arbitrary CDN origin. They are not yet drop-in usable for the full live-test scenario sweep. CC-04 was answered by direct HTTP probing, not via the sweep.
+
+### Changes
+- `context/EXAMPLE_VALIDATION.md` — CC-04 section rewritten as RESOLVED=UPSERT; B-C1, B-R1, CC-C1, CEP-C1 marked resolved; table marks updated (asterisks removed from cacheControl and customErrorPages; body/cacheControl gained "✓ done / ✅ probe" in Live Candidate/Live Test columns); HE-C3 finding revised to clarify the guard's real purpose.
+- `examples/headers/assembly/index.ts` — comment at line 128 rewritten. The old wording (*"Ensure the 'cache-control' header is present - cannot replace a header that does not exist"*) implied production strict-replace semantics that don't exist. New comment explains the actual reason for the guard: avoid upserting an empty value on an absent `cache-control`.
+
+---
+
 ## [2026-05-12] — Symmetric set-equality in `examples/headers` diff (parity)
 
 ### Overview

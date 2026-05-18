@@ -7,6 +7,9 @@
     ],
     "status": 200,
     "body": "Hello World, this is a test message",
-    "contentType": "text/plain"
+    "contentType": "text/plain",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    }
   }
 }

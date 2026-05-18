@@ -9,9 +9,6 @@
     },
     "body": ""
   },
-  "log": {
-    "level": "info"
-  },
   "properties": {
     "request.country": "FR",
     "request.host": "example.com",

@@ -7,6 +7,9 @@
     ],
     "status": 200,
     "body": "Original message body (36 bytes) redacted.\n",
-    "contentType": "text/plain"
+    "contentType": "text/plain",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    }
   }
 }

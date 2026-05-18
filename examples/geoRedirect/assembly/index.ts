@@ -9,7 +9,6 @@ import {
   RootContext,
   send_http_response,
   set_property,
-  stream_context,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 import {
   getEnv,
@@ -70,7 +69,6 @@ class GeoRedirect extends Context {
     if (hostArrBuf.byteLength > 0) {
       const host = String.UTF8.decode(hostArrBuf);
       log(LogLevelValues.debug, `Provided Host: ${host}`);
-      stream_context.headers.request.replace("Host", host);
     }
 
     const pathArrBuf = get_property("request.path");
@@ -85,7 +83,7 @@ class GeoRedirect extends Context {
     }
 
     const path = String.UTF8.decode(pathArrBuf);
-    const origin = countrySpecificOrigin || defaultOrigin;
+    const origin = countrySpecificOrigin === "" ? defaultOrigin : countrySpecificOrigin;
     // remove trailing slashes from the origin
     const cleanedOrigin = origin.endsWith("/") ? origin.slice(0, -1) : origin;
 
@@ -101,4 +99,4 @@ class GeoRedirect extends Context {
 
 registerRootContext((context_id: u32) => {
   return new GeoRedirectRoot(context_id);
-}, "georedirect");
+}, "geoRedirect");

@@ -1,7 +1,25 @@
 {
   "expected": {
     "logs": [
-      "onRequestHeaders >> "
-    ]
+      "onRequestHeaders >> uri: http://fastedge-builtin.debug/page.html?test=value",
+      "onRequestHeaders >> path: /page.html?test=value",
+      "onRequestHeaders >> scheme: http",
+      "onRequestHeaders >> extension: html",
+      "onRequestHeaders >> query: test=value",
+      "onRequestHeaders >> client_ip: 203.0.113.1",
+      "onRequestHeaders >> country: LU",
+      "onRequestHeaders >> city: Luxembourg",
+      "query=test=value"
+    ],
+    "headers": {
+      "request-uri": "http://fastedge-builtin.debug/page.html?test=value",
+      "request-path": "/page.html?test=value",
+      "request-scheme": "http",
+      "request-extension": "html",
+      "request-query": "test=value",
+      "request-x-real-ip": "203.0.113.1",
+      "request-country": "LU",
+      "request-city": "Luxembourg"
+    }
   }
 }

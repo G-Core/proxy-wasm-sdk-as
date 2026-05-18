@@ -71,22 +71,22 @@ Legend: ✅ pass · ⚠️ pass-with-issues · ❌ fail · 🟡 in-progress · �
 |---|---|---|---|---|---|---|---|---|---|
 | [helloWorld](../examples/helloWorld/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
 | [headers](../examples/headers/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [body](../examples/body/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [body](../examples/body/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | — |
 | [variablesAndSecrets](../examples/variablesAndSecrets/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
 | [logTime](../examples/logTime/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [properties](../examples/properties/) | ✅ | 1 | 1/1 | ❌ | ⬜ | ⬜ | — | — | — |
+| [properties](../examples/properties/) | ✅ | 1 | 1/1 | ✅ | ⬜ | ⬜ | — | — | — |
 
 ### Full Examples
 
 | Example | Build | `.test.json` | `.live.json` coverage | Local Test | Code Review | README Review | Live Candidate | Live Test | Sign-off |
 |---|---|---|---|---|---|---|---|---|---|
-| [abTesting](../examples/abTesting/) | ✅ | 4 | 4/4 | ⚠️ | ⚠️ | ⚠️ | — | — | — |
-| [apiKey](../examples/apiKey/) | ✅ | 4 | 4/4 | ⚠️ | ⚠️ | ⚠️ | — | — | — |
-| [cacheControl](../examples/cacheControl/) | ✅ | 7 | 7/7 | ✅* | ⚠️ | ⚠️ | — | — | — |
+| [abTesting](../examples/abTesting/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [apiKey](../examples/apiKey/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [cacheControl](../examples/cacheControl/) | ✅ | 7 | 7/7 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | — |
 | [cors](../examples/cors/) | ✅ | 3 (+wildcard) | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [customErrorPages](../examples/customErrorPages/) | ✅ | 6 | 6/6 | ✅* | ⚠️ | ⚠️ | — | — | — |
-| [geoBlock](../examples/geoBlock/) | ✅ | 3 | 3/3 | ⚠️ | ⚠️ | ⚠️ | — | — | — |
-| [geoRedirect](../examples/geoRedirect/) | ✅ | 2 | 2/2 | ❌ | ❌ | ⚠️ | — | — | — |
+| [customErrorPages](../examples/customErrorPages/) | ✅ | 6 | 6/6 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [geoBlock](../examples/geoBlock/) | ✅ | 3 | 3/3 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [geoRedirect](../examples/geoRedirect/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | — |
 | [httpCall](../examples/httpCall/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
 | [jwt](../examples/jwt/) | ✅ | 5 (authored) | 5/5 | ✅ | ⚠️ | ⚠️ | — | — | — |
 | [kvStore](../examples/kvStore/) | ✅ | 0 | 0/0 | 🚫 runner gap | ⬜ | ⬜ | ✓ required | — | — |
@@ -210,7 +210,7 @@ Append entries under each example. Format:
 
 - **HE-C1 (Style — duplication):** `onRequestHeaders` (lines 81–178) and `onResponseHeaders` (lines 180–241) duplicate the same add/remove/replace dance, including doubled `expectedHeaders` blocks (151–154 vs 213–217). Duplication may be deliberate (showing same API on both phases) but feels padded. Consider extracting a shared helper, or trimming one phase to remove the redundancy.
 - **HE-C2 (Hidden teaching):** Lines 126–146 inside `onRequestHeaders` demonstrate cross-phase header writes — adds `new-response-header` in the *request* phase, then re-reads and replaces it in the same phase. The inline comment at lines 136–137 explicitly notes this is "a common issue in Proxy-Wasm environments where certain operations are only valid during specific phases." Great teaching moment but buried inside the request handler. Surface in the README (see HE-R1).
-- **HE-C3 (Correct guard pattern — positive finding):** Lines 130–133 demonstrate the correct `.get().length > 0` guard before `.replace()`. This is the convention `body` violates (B-C1) — direct reference point for **CC-04**.
+- **HE-C3 (Guard pattern — pedagogy, revised post-CC-04):** Lines 130–133 use a `.get().length > 0` guard before `.replace("cache-control", "")`. Per CC-04 RESOLVED=UPSERT this guard is **not** needed for "can `.replace()` add the header" reasons (it can — production upserts). It IS still useful here to avoid upserting an empty-valued `cache-control` when none was set. Comment at line 128 corrected on 2026-05-13 to reflect this.
 - **HE-C4 (Pedagogy):** `validateHeaders` uses `Set<string>` of `"name:value"` concatenations as a workaround for AssemblyScript's limited generics. Clever but opaque for learners. A two-line comment explaining the encoding choice would help.
 - **HE-C5 (Style):** Unused `a: u32` parameter on hooks. Compare `headers: u32` in `body`. Inconsistent naming convention for unused parameters across the codebase — worth deciding on `_` prefix or descriptive name.
 
@@ -239,20 +239,20 @@ Append entries under each example. Format:
 
 **Findings — Code Review (`assembly/index.ts`):**
 
-- **B-C1 (Convention mismatch):** Line 81 calls `stream_context.headers.response.replace("transfer-encoding", "Chunked")` without first checking the header exists. The `headers` example demonstrates the correct guard pattern at lines 130–133 (`.get()` length-check before `.replace()`). With the synthetic builtin origin this is a silent no-op. Inconsistent with the SDK's own demonstrated convention; should follow the guard pattern or use `.add()` if the intent is to set unconditionally.
+- ~~**B-C1 (Convention mismatch):**~~ **NON-BUG per CC-04 resolution (2026-05-13).** Live edge probe confirmed `.replace()` upserts in production. The `headers` example's guard pattern is defensive but not required; the `headers` example's source comment claiming the opposite is wrong. Line 81's `replace("transfer-encoding", "Chunked")` works as intended. Kept here as a historical reference for the investigation.
 - **B-C2 (Style):** `"Chunked"` capitalization on line 81 — RFC 7230 normalizes `transfer-encoding` values to lowercase. Most CDNs canonicalize. Minor.
 - **B-C3 (Pedagogy):** `setLogLevel(info)` on line 21 suppresses the `"onRequestHeaders >>"` / `"onRequestBody >>"` / `"onResponseHeaders >>"` / `"onResponseBody >>"` hook-entry logs (lines 35, 45, 75, 95) — a learner reading source expecting to see them will be confused. Either bump to INFO or annotate in README.
 - **B-C4 (Redundant demonstration):** Lines 83–86 store `content-type` into a custom property `response.content_type`, but the runner already auto-calculates this exact property name from the response header. The set is overwriting a calculated value with the same value. Teaches cross-hook state but should have an inline comment explaining the redundancy.
 
 **Findings — README Review:**
 
-- **B-R1:** Step 3 says "sets `transfer-encoding: Chunked`" — but per B-C1 this is a silent no-op against the synthetic origin (no pre-existing header to replace). README implies behavior that doesn't happen.
+- ~~**B-R1:**~~ **RESOLVED per CC-04 (2026-05-13).** README is correct — `.replace()` does set the header in production (upsert semantics). Original concern was based on the now-corrected assumption that production was strict.
 - **B-R2:** No mention of the cross-hook state pattern (B-C4) as a teaching point — the README mentions the `content-type` capture in passing but doesn't call out that this is the demonstration's purpose.
 - **B-R3:** No mention of which logs are visible (debug-suppressed vs info) — pairs with B-C3.
 
-**Next action:** **needs-rework** before sign-off — apply fixes for B-C1 (header guard pattern) + B-R1 (matching README correction). B-C2, B-C3, B-C4, B-R2, B-R3 are minor polish; could be batched.
+**Next action:** **polish-only** — B-C1/B-R1 cleared by CC-04 RESOLVED=UPSERT. B-C2, B-C3, B-C4, B-R2, B-R3 are minor polish; could be batched.
 
-Possible cross-cutting candidate: **CC-04** — if other examples that use `.replace()` on response headers omit the guard pattern, promote this to a cross-cutting convention enforcement. Watch in upcoming rows.
+CC-04 resolution: live-confirmed UPSERT on edge (see cross-cutting findings below).
 
 ### variablesAndSecrets
 
@@ -351,6 +351,16 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 
 **Next action:** **blocked** on example fix decision. When we reach this row in systematic order, decide between fix options (1/2/3), apply, rebuild, re-run comparator, then re-author `.live.json` if needed (the current one is itself thin — only asserts the `"onRequestHeaders >> "` log substring).
 
+#### 2026-05-18 — AS call_indirect bug fixed; Local Test ✅
+
+**Fix applied:** Promoted nested function `handleProperty` to a `private` class method on `Properties`. Direct method dispatch means AS applies default parameters correctly — no more null-pointer trap on `propertyName.length` when `propertyName` defaulted to 0. All 9 call sites updated to `this.handleProperty(...)`.
+
+**Assertions updated:** `happy-path.live.json` rewritten from the thin placeholder (`"onRequestHeaders >> "`) to full assertions: 9 log substrings (uri, path, scheme, extension, query, client_ip, country, city, query-string block) and all 8 response headers injected by the example.
+
+**Local Test:** ✅ — 1/1 fixture passes. All 9 log assertions and 8 header assertions verified against actual runner output.
+
+**Next action:** Code review and README review still pending (⬜).
+
 ### abTesting
 
 #### 2026-05-13 — full validation pass
@@ -388,6 +398,11 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 
 **Next action:** **needs-rework** — AB-C1 (cleanup) and AB-C2 (variant entropy decision) are the meaningful items. `missing-config` row will remain ⚠️ until AB-S1 is resolved upstream.
 
+#### 2026-05-18 — CC-08 resolved in fastedge-test@0.2.2
+
+**Local Test:** ✅ — 4/4 fixtures pass (including `missing-config`). The WASI env fix in 0.2.2 correctly initialises an empty env table when no dotenv is configured — `getEnv` no longer traps; the example's own `if (experimentName === "")` guard now fires cleanly and produces the expected 500 response.
+**Next action:** needs-rework still applies for AB-C1 + AB-C2.
+
 ### apiKey
 
 #### 2026-05-13 — full validation pass
@@ -424,13 +439,18 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 
 **Next action:** **needs-rework** — AK-C4 (security note/helper) + AK-C6/AK-R2 (remove semantics docs) are the meaningful items. `missing-header` row will stay ⚠️ until CC-09 is fixed in fastedge-test.
 
+#### 2026-05-18 — CC-09 resolved in fastedge-test@0.2.2
+
+**Local Test:** ✅ — 4/4 fixtures pass (including `missing-header`). The `mergedHeaders` fix in 0.2.2 propagates `send_http_response` additional headers into `localResponse` and through to `FullFlowResult.finalResponse.headers`. `WWW-Authenticate: API-Key` now asserts correctly.
+**Next action:** needs-rework still applies for AK-C4 + AK-C6/AK-R2.
+
 ### cacheControl
 
 #### 2026-05-13 — full validation pass
 
 **Assertions:** ✅ — 7/7 `.live.json` siblings authored from `assembly/index.ts` + `fixtures/.env`
-**Local Test:** ✅* — 7/7 fixtures pass; **asterisk because pass depends on runner upsert semantics that may not match production** (CC-C1)
-**Code Review:** ⚠️ — pass-with-issues (4 findings; CC-C1 is critical)
+**Local Test:** ✅ — 7/7 fixtures pass; runner upsert matches production (CC-04 RESOLVED=UPSERT, 2026-05-13)
+**Code Review:** ⚠️ — pass-with-issues (4 findings; CC-C1 cleared)
 **README Review:** ⚠️ — pass-with-issues (2 findings; CC-R1 positive)
 
 **`.live.json` design notes:**
@@ -438,7 +458,7 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 - `error-status.test.json` uses `x-debugger-status: 500` to force a 5xx; example sets `Cache-Control: no-store` via the early-return path (lines 39-42).
 - All 7 PASS — including `cache-control` and `vary` header assertions.
 
-**CRITICAL local-vs-production parity concern (CC-C1):**
+**~~CRITICAL local-vs-production parity concern (CC-C1)~~** — **RESOLVED 2026-05-13, see CC-04 RESOLVED=UPSERT below.** Original analysis retained for trail:
 
 The example uses `stream_context.headers.response.replace("Cache-Control", ...)` (lines 39, 78) without a `.get().length > 0` guard. Reading the fastedge-test runner source (`dist/lib/index.js` lines 1108-1119):
 
@@ -463,7 +483,7 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 
 **Findings — Code Review (`assembly/index.ts`):**
 
-- **CC-C1 (CRITICAL — production parity):** see above. All `.replace()` calls assume upsert behavior. Cannot ship without verifying production semantics. See updated CC-04.
+- ~~**CC-C1 (CRITICAL — production parity)**~~ — **RESOLVED 2026-05-13.** Live edge probe (CDN resource 2296532, app cache-control id 806553, rule 22024945 at `/livetest-cache-control/`) confirmed `.replace("Cache-Control", "no-store")` upserts on origin responses without pre-set Cache-Control. The disambiguating evidence: Cache-Control appeared with the wasm's exact value only after propagation completed (warmups 1–3 absent, warmup 4 present). All 4 `.replace("Cache-Control", ...)` call sites work as-written. See CC-04 RESOLVED below.
 - **CC-C2 (Status decoding fragility):** Lines 30-35 decode `response.status` as big-endian u16 from an ArrayBuffer (`(bytes[0] << 8) | bytes[1]`). Works against the fastedge-test runner because the runner encodes status that way; proxy-wasm spec doesn't mandate this encoding (could equally be ASCII digit bytes for `"200"`). Worth a comment explaining the assumption.
 - **CC-C5 (Vary uses .add, not .replace):** Lines 61, 72 — `stream_context.headers.response.add("Vary", ...)`. If upstream already set Vary, this produces a multi-value Vary header (RFC-valid). Subtle implication for caching keys. Worth a comment.
 - **CC-C9 (CC-11 latent bug — fallback masked):** Lines 49-51 — `getEnv("STATIC_MAX_AGE") || "31536000"` etc. Per CC-11 (revised), AS `||` on empty strings returns the empty string, NOT the fallback. The fixture `.env` has all three keys set to non-empty values, masking the bug. If a user deploys with an env var explicitly set to empty (e.g., `STATIC_MAX_AGE=`), the example would produce `cache-control: public, max-age=` (invalid header) instead of the documented default. Fix same as GR-C1: `const staticMaxAge = getEnv("STATIC_MAX_AGE") === "" ? "31536000" : getEnv("STATIC_MAX_AGE");` or a small helper.
@@ -474,7 +494,7 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 - **CC-R1 (Positive):** Best-structured README so far. Clear cache-policy table, configuration table with defaults, complete deploy instructions. Reference candidate for **CC-07** template.
 - **CC-R2:** Doesn't acknowledge the `.replace()` semantics question. A user copying this example may not realize behavior depends on origin already setting Cache-Control. Pair with CC-C1.
 
-**Next action:** **BLOCKED ON CC-04 RESOLUTION.** Once production `.replace()` semantics are confirmed, decide between (a) accept as-is + fix headers-example comment, or (b) guard every `.replace()` call (broader rework affecting body and cacheControl).
+**Next action:** **CC-04 RESOLVED (UPSERT, 2026-05-13).** Path (a) taken — accept code as-is, headers-example comment needs correction. Remaining items (CC-C2 status decoding, CC-C5 Vary docs, CC-C8 case-sensitive lookup, CC-C9 `||` fallback) are unrelated polish.
 
 ### cors
 
@@ -514,8 +534,8 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 #### 2026-05-13 — full validation pass
 
 **Assertions:** ✅ — 6/6 `.live.json` siblings authored from `assembly/index.ts`
-**Local Test:** ✅* — 6/6 fixtures pass; **asterisk: 5/6 rows assert `transfer-encoding: Chunked` which depends on the same runner-upsert semantics as cacheControl** (CC-04). Content-Type assertions are CC-04-neutral because the builtin does pre-set Content-Type.
-**Code Review:** ⚠️ — pass-with-issues (6 findings; CEP-C1 is the CC-04 instance, CEP-C4/C10 are positive)
+**Local Test:** ✅ — 6/6 fixtures pass; runner upsert matches production (CC-04 RESOLVED=UPSERT, 2026-05-13).
+**Code Review:** ⚠️ — pass-with-issues (6 findings; CEP-C1 cleared, CEP-C4/C10 are positive)
 **README Review:** ⚠️ — pass-with-issues (3 findings; CEP-R1 positive)
 
 **`.live.json` design notes:**
@@ -526,7 +546,7 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 
 **Findings — Code Review (`assembly/index.ts`):**
 
-- **CEP-C1 (CC-04 instance):** Line 41 — `replace("Transfer-Encoding", "Chunked")` without guard. Builtin response doesn't pre-set Transfer-Encoding (only `content-type` + `content-length`). Locally PASSes only because the runner upserts. **Same production-parity risk as B-C1 and CC-C1.** Data point #3 for CC-04 across the codebase. Note: `replace("Content-Type", "text/html")` on line 39 IS safe — builtin does pre-set Content-Type for status-only mode.
+- ~~**CEP-C1 (CC-04 instance)**~~ — **RESOLVED 2026-05-13, see CC-04 RESOLVED=UPSERT.** Line 41's `replace("Transfer-Encoding", "Chunked")` works as intended in production. Line 39's `replace("Content-Type", "text/html")` was already safe (builtin pre-sets Content-Type).
 - **CEP-C2 (Status decoding fragility — duplicate of CC-C2):** Lines 30-36 and 54-60 use the same big-endian u16 ArrayBuffer decode for `response.status` as cacheControl. Candidate for extraction into a shared SDK helper (`getResponseStatusCode(): u32`).
 - **CEP-C3 (Acceptable duplication):** Status check duplicated across `onResponseHeaders` (lines 29-44) and `onResponseBody` (lines 49-67). The example's own comment at line 53 acknowledges: "Read response status from property (no instance state between hooks)". Correct workaround for the proxy-wasm/nginx hop model documented in the abTesting example (line 111-112). Reasonable.
 - **CEP-C4 (Positive — no XSS risk):** Lines 73-103 build HTML by concatenation, but the inserted values (`title`, `description`, `category`, `code.toString()`) all come from static lookup tables — no user input. Clean.
@@ -541,7 +561,7 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 - **CEP-R3:** No HTML output preview — copy-paste users would want to see what the rendered page looks like.
 - **CEP-R4:** No charset note (pairs with CEP-C5).
 
-**Next action:** **BLOCKED ON CC-04 RESOLUTION** for the Transfer-Encoding portion (rest is clean). CEP-C1 is the CC-04 item; CEP-C2 could feed a separate SDK helper proposal. CEP-C5/C6 minor.
+**Next action:** **CC-04 RESOLVED (UPSERT, 2026-05-13).** CEP-C1 cleared. CEP-C2 could feed a separate SDK helper proposal. CEP-C5/C6 minor.
 
 ### geoBlock
 
@@ -577,6 +597,11 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 - **GB-R4:** No mention of logging (pairs with GB-C3) — observability matters for security features.
 
 **Next action:** **needs-rework** — GB-C1 (remove dead field), GB-C3 (add audit logs), GB-C10 (registration id casing) are the actionable items. GB-C5/C7/C9 are polish. `missing-config` stays ⚠️ until CC-08 is fixed.
+
+#### 2026-05-18 — CC-08 resolved in fastedge-test@0.2.2
+
+**Local Test:** ✅ — 3/3 fixtures pass (including `missing-config`). Same fix as abTesting — `getEnv` no longer traps on uninitialized WASI env; example's `if (!blacklist) { send 500 }` error path now reachable and produces the correct response.
+**Next action:** needs-rework still applies for GB-C1 + GB-C3 + GB-C10.
 
 ### geoRedirect
 
@@ -615,6 +640,21 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 **Next action:** **BLOCKED on bug fix.** GR-C1 + GR-C2 are real bugs, not polish. The example does not behave as its README documents. Needs source fix before re-run.
 
 Promoted AS truthy/falsy semantics to **CC-11**.
+
+#### 2026-05-18 — bugs fixed; Local Test ✅
+
+**Fixes applied:**
+
+- **GR-C1 (RESOLVED):** `const origin = countrySpecificOrigin || defaultOrigin` → `const origin = countrySpecificOrigin === "" ? defaultOrigin : countrySpecificOrigin`. Empty-string fallback now works correctly. `default.test.json` (FR, not in env) now produces `requestUrl: "https://default-origin.example.com/test"` as the README documents.
+- **GR-C5 (RESOLVED):** Registration id changed from `"georedirect"` to `"geoRedirect"`.
+- **GR-C6 (RESOLVED):** Removed `stream_context.headers.request.replace("Host", host)` (no-op host replace). Kept the surrounding block — logging the incoming host at DEBUG level is useful debugging context.
+- **GR-C9 (RESOLVED):** Removed extraneous `"log": {"level": "info"}` field from `default.test.json`.
+
+**Local Test:** ✅ — 2/2 fixtures pass (default + germany).
+
+**Code Review:** ⚠️ — Critical bugs resolved. Remaining items: GR-C3 (all logs at DEBUG, filtered by setLogLevel(info) — zero runtime visibility), GR-C7 (no URL validation), GR-C8 (502 for missing-country is a dubious status choice). GR-R2 resolved by the fix (README now accurately describes behavior). GR-R3/R4 still minor issues.
+
+**Next action:** README review still ⚠️. GR-C3 (log levels) is worth addressing if a Tier 3 pass touches this example.
 
 ### httpCall
 
@@ -756,35 +796,41 @@ The properties example (see its section) hit a real AssemblyScript compilation q
 
 Built at `fastedge-coordinator/tools/fixture-validator/` rather than inside `proxy-wasm-sdk-as`. Reasoning: cross-SDK reusability (Rust CDN apps emit the same proxy-wasm wasm format and can be validated with the same JSON-driven harness). If usefulness is demonstrated across this validation pass, candidate for upstreaming as `runFixtureFile()` into `@gcoredev/fastedge-test` so it's reachable from every SDK.
 
-### CC-04 — `.replace()` semantics: production parity unknown (CRITICAL, 2026-05-13)
+### CC-04 — `.replace()` semantics: **RESOLVED = UPSERT** (2026-05-13)
 
-**Promoted from "guard convention" to "production parity question" after reading runner source for cacheControl validation.**
-
-The fastedge-test runner implements `proxy_replace_header_map_value` as **upsert** (filter-out-then-add) — `.replace()` works whether or not the header pre-exists. See `@gcoredev/fastedge-test@0.2.1` `dist/lib/index.js` lines 1108-1119.
-
-The `headers` example's source comment at line 130 says *"cannot replace a header that does not exist"*, implying production FastEdge has stricter semantics where `.replace()` on an absent header is a no-op.
-
-Both interpretations have evidence:
-- **Upsert wins:** body B-C1 isn't a bug; cacheControl is correct; headers example's comment is wrong.
-- **Strict wins:** body B-C1 is real; cacheControl silently fails in production whenever upstream doesn't already set Cache-Control (= most responses); headers example's guard pattern is the correct convention.
-
-**Affected rows (3 confirmed):**
-- `body` B-C1 — `replace("transfer-encoding", "Chunked")` without guard. 1 call site.
-- `cacheControl` CC-C1 — `.replace("Cache-Control", ...)` in 4+ places without guard. 4 call sites. Locally PASSes 7/7 only because runner upserts.
-- `customErrorPages` CEP-C1 — `replace("Transfer-Encoding", "Chunked")` without guard. 1 call site. Locally PASSes 6/6 only because runner upserts. (Note: `replace("Content-Type", "text/html")` is CC-04-neutral because the builtin pre-sets Content-Type.)
-
-**Not affected so far:**
-- `cors` — uses `.add()` for all response header writes.
-
-**Affected if not yet reached:** any remaining example using `.replace()` on response headers — possible candidates: `geoBlock`, `geoRedirect`, `largeDictionary`, `httpCall`, `jwt`, `kvStore`. Watch as we reach them.
+**Verified on live FastEdge edge.** Production `.replace()` is **upsert** — adds the header when absent. Matches the fastedge-test runner. The `headers` example's source comment at line 130 (*"cannot replace a header that does not exist"*) is **wrong/outdated**.
 
 **Resolution path:**
-1. Verify on a live FastEdge deployment whether `.replace()` on an absent header (a) adds it, (b) is a no-op, or (c) returns an error. The visual debugger or `gcore-fastedge:live-test` is the right tool.
-2. Update the headers example's line 130 comment to reflect reality.
-3. If strict: fix body + cacheControl + any others to use the guard pattern OR switch to `.add()` (with idempotency caveats).
-4. If upsert: no code changes needed; remove the "cannot replace…" comment from headers; comparator runs trust the result.
+1. ~~Update `headers/assembly/index.ts` line ~130 comment~~ — **DONE 2026-05-13.** Replaced "cannot replace a header that does not exist" with a comment explaining the guard's real purpose: avoid creating an empty `cache-control` header by upserting on an absent one. The guard stays — it has a semantic role here, just not the one the old comment claimed.
+2. ~~Drop the `*` caveats on Local Test marks~~ — **DONE.** cacheControl and customErrorPages updated.
+3. No code changes needed in `body`, `cacheControl`, `customErrorPages` — their `.replace()` calls work as-written.
 
-**This is the highest-priority blocker for `feature/more-examples-httpbin` merge.** Without resolution, we cannot trust Local Test ✅ marks for any row that uses `.replace()` without a guard.
+#### Evidence (live edge, resource 2296532, cname `cdn.godronus.xyz`, 2026-05-13)
+
+Two CDN apps deployed against the same resource (httpbin origin, returns 404 with `Content-Length: 233` and no Cache-Control / no Transfer-Encoding):
+
+| App | Wasm call | Observed (HTTP/1.1) | Observed (HTTP/2) |
+|---|---|---|---|
+| `body` (id 806551, rule 22024943) | `replace("transfer-encoding", "Chunked")` + `remove("content-length")` | `Transfer-Encoding: chunked` (value lowercased by CDN); no Content-Length | no Transfer-Encoding (HTTP/2 strips); no Content-Length |
+| `cache-control` (id 806553, rule 22024945) | `replace("Cache-Control", "no-store")` (error-status branch, 404 ≥ 400) | `Cache-Control: no-store` (exact value match) | (not retested; same edge node) |
+
+The disambiguator is `cache-control`. Cache-Control has no protocol-level auto-set path — its appearance with the wasm's exact value, **only after propagation completed** (4 warmups: first 3 had no Cache-Control, the 4th had `Cache-Control: no-store`), is conclusive proof of upsert.
+
+The body test's lowercase `chunked` is CDN HTTP/1.1 protocol-token normalization (RFC-canonical), not evidence of no-op. Arbitrary header values like `no-store` pass through verbatim.
+
+#### Findings flipped from "real bug" to "non-bug" (3 rows)
+
+- ~~`body` B-C1~~ — **non-bug**. `.replace("transfer-encoding", "Chunked")` upserts in production.
+- ~~`cacheControl` CC-C1~~ — **non-bug**. All 4 `.replace("Cache-Control", ...)` call sites upsert. Local 7/7 PASS reflects production.
+- ~~`customErrorPages` CEP-C1~~ — **non-bug**. Both `replace("Content-Type", ...)` and `replace("Transfer-Encoding", ...)` upsert.
+
+#### Live infrastructure left in place
+
+App `body` and rule `/livetest-body/` (id 22024943), app `cache-control` and rule `/livetest-cache-control/` (id 22024945) remain attached on resource 2296532 for follow-up runs. To clean up: `PATCH /cdn/resources/2296532/rules/{id}` with `{ "active": false }`, or re-run live-test with `--cleanup`.
+
+#### Side-finding: gitignore typo in proxy-wasm-sdk-as
+
+`.gitignore` line `examples/**/livetest.cog.json` is a typo — should be `livetest.config.json`. Currently `body/fixtures/livetest.config.json` is tracked-eligible. Fix path: rename the pattern or remove it (the file is intentional per-app config and probably should be committed alongside the fixtures it parameterizes).
 
 ### CC-05 — Secret-logging antipattern (1 violation, 1 correct, 2026-05-13)
 
@@ -803,7 +849,7 @@ Reviewed examples so far split into three groups: explicit `info` (`body`, `head
 
 Reviewed READMEs vary in structure. `helloWorld` is minimal (no "What it does", no "Deploy"). `logTime`, `body`, `headers`, `variablesAndSecrets`, `abTesting` each have a "What it does" but differ in depth. None have a uniform "Expected behavior / logs to expect" section that would tell a developer what running the example should show them. Consider standardising on a template: Title → What it does → Configuration (if any) → Build → Deploy → Expected behavior / logs. Decide on the template after a few more examples are reviewed so we pick the right shape.
 
-### CC-08 — SDK `getEnv` crashes on uninitialized WASI env (2026-05-13)
+### CC-08 — SDK `getEnv` crashes on uninitialized WASI env — **RESOLVED in fastedge-test@0.2.2** (2026-05-13)
 
 The SDK's `getEnv` (`assembly/fastedge/dictionary.ts` line 14–20) calls `process.env.has(name)` which assumes the WASI env table is initialized. When the fastedge-test runner runs a proxy-wasm flow without dotenv enabled, the env table is corrupted/missing and `process.env.has()` traps with `RuntimeError: memory access out of bounds`. This is reachable by any example fixture that does not enable dotenv. Production FastEdge guarantees an at-least-empty WASI env, so the SDK is allowed to assume this — the gap is in the runner, not the SDK.
 
@@ -819,7 +865,9 @@ Two paths to fix:
 
 Until resolved, validator rows that exercise the "no env" error path will be ⚠️ blocked on AB-S1 / CC-08.
 
-### CC-09 — Runner drops `send_http_response` additional headers (2026-05-13)
+**RESOLVED 2026-05-18:** Path 1 (runner fix) taken. `fastedge-test@0.2.2` now initialises an empty WASI env table for every runner invocation regardless of dotenv config. Both `abTesting/missing-config` and `geoBlock/missing-config` pass 1/1 — the examples' own error-handling paths are now reachable. Local Test columns updated to ✅ (4/4 and 3/3 respectively).
+
+### CC-09 — Runner drops `send_http_response` additional headers — **RESOLVED in fastedge-test@0.2.2** (2026-05-13)
 
 `@gcoredev/fastedge-test@0.2.1` runner has a known TODO in its `proxy_send_local_response` host-call shim (`dist/lib/index.js` lines 1201–1218):
 
@@ -839,6 +887,8 @@ First confirmed by **apiKey/missing-header.test.json** (asserts `WWW-Authenticat
 Fix path: upstream in `@gcoredev/fastedge-test` — merge deserialized headers into `localResponse.headers` and propagate to `FullFlowResult.finalResponse.headers`.
 
 Until resolved, validator rows that assert headers set via `send_http_response` will be ⚠️ blocked on CC-09. `.live.json` files should still be authored correctly (asserting what the example contracts to deliver) — the live harness verifies the assertion is correct in production.
+
+**RESOLVED 2026-05-18:** `fastedge-test@0.2.2` (`mergedHeaders` fix) now merges the deserialized header pairs into `localResponse.headers` and propagates them through `FullFlowResult.finalResponse.headers`. `apiKey/missing-header` (`WWW-Authenticate: API-Key`) now asserts correctly. Local Test column updated to ✅ (4/4).
 
 ### CC-11 — AssemblyScript `||` short-circuit on empty strings (REVISED 2026-05-13)
 
@@ -895,4 +945,4 @@ This is purely cosmetic but should not ship — example code is copied and these
 
 ---
 
-**Last Updated:** 2026-05-13 (Phase 0 comparator built at `tools/fixture-validator/`; pilot run completed against helloWorld/headers/logTime/properties; first cross-cutting findings logged)
+**Last Updated:** 2026-05-18 (Tier 2 complete: properties AS call_indirect bug fixed → 1/1 ✅; geoRedirect AS || bug + registration id + host-replace removed → 2/2 ✅; as-constraints.md created in fastedge-plugin; 17/17 examples have authored fixtures; 16/17 ✅ Local Test — kvStore deferred to Phase 2)

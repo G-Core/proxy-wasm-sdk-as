@@ -125,7 +125,9 @@ class HttpHeaders extends Context {
     // Try to set/add response headers
     stream_context.headers.response.add("new-response-header", "value-01");
 
-    // Ensure the "cache-control" header is present - cannot replace a header that does not exist
+    // Only blank "cache-control" when it is already set — `.replace()` upserts on
+    // FastEdge, so without this guard an absent header would be created with an
+    // empty value.
     const cacheControlHeader =
       stream_context.headers.response.get("cache-control");
     if (cacheControlHeader.length > 0) {

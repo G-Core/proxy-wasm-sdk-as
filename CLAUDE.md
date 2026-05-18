@@ -83,6 +83,8 @@ Use the decision tree in CONTEXT_INDEX.md to determine what to read. **Only read
 - **Required abort config** — `asconfig.json` must include `"use": "abort=abort_proc_exit"`
 - **SDK dependency** — examples use `"^1.2.3"` (published npm version), NOT `"file:../.."`
 - **Single-threaded** — wasm execution is single-threaded; global state in `runtime.ts` is safe
+- **No default params on nested functions** — AS compiles nested functions to `call_indirect`; default values are NOT applied for indirect calls. Unspecified arg slots receive `0` (null pointer), which traps on any string or object access. Fix: promote to a class `private` method (direct call; defaults work), or pass all args explicitly at every call site.
+- **`||` is pointer-truthy, not value-falsy** — `str || "fallback"` returns `str` even when `str === ""` because the empty-string object has a non-zero pointer. Use `str === "" ? "fallback" : str` for empty-string guards. Note: `!str` IS correct (`String.__not` handles both `null` and `""`).
 
 ---
 
