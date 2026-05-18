@@ -1,7 +1,7 @@
 {
   "expected": {
     "logs": [
-      "Farq: -> CorsContext -> onRequestHeaders -> origin: https://app.example.com"
+      "onRequestHeaders >> origin: https://app.example.com"
     ],
     "status": 200,
     "contentType": "application/json",

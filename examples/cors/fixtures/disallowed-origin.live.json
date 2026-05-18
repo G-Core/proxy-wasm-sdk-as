@@ -1,7 +1,7 @@
 {
   "expected": {
     "logs": [
-      "Farq: -> CorsContext -> onRequestHeaders -> origin: https://evil.example.com",
+      "onRequestHeaders >> origin: https://evil.example.com",
       "CORS: origin not allowed: https://evil.example.com"
     ],
     "status": 200,

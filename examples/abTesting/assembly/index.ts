@@ -88,10 +88,7 @@ class AbTestingContext extends Context {
       const query = queryBuf.byteLength > 0 ? String.UTF8.decode(queryBuf) : "";
       const newUrl =
         scheme + "://" + host + newPath + (query.length > 0 ? "?" + query : "");
-      log(
-        LogLevelValues.info,
-        `Farq: -> AbTestingContext -> onRequestHeaders -> newUrl: ${newUrl}`,
-      );
+      log(LogLevelValues.info, `A/B routing: ${newUrl}`);
       set_property("request.url", String.UTF8.encode(newUrl));
     }
 

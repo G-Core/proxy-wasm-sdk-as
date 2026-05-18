@@ -28,10 +28,7 @@ class CorsContext extends Context {
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     const allowedOrigins = getEnv("ALLOWED_ORIGINS");
     const origin = stream_context.headers.request.get("Origin");
-    log(
-      LogLevelValues.info,
-      "Farq: -> CorsContext -> onRequestHeaders -> origin: " + origin,
-    );
+    log(LogLevelValues.info, "onRequestHeaders >> origin: " + origin);
 
     if (origin === "") {
       return FilterHeadersStatusValues.Continue;

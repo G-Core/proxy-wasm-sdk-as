@@ -2,7 +2,7 @@
   "expected": {
     "logs": [
       "A/B test \"homepage-hero\": variant ",
-      "Farq: -> AbTestingContext -> onRequestHeaders -> newUrl: http://example.com/"
+      "A/B routing: http://example.com/"
     ],
     "status": 200,
     "contentType": "application/json",

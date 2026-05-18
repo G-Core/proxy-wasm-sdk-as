@@ -3,11 +3,16 @@ import {
   Context,
   FilterHeadersStatusValues,
   get_property,
+  log,
+  LogLevelValues,
   registerRootContext,
   RootContext,
   send_http_response,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
-import { getEnv } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
+import {
+  getEnv,
+  setLogLevel,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
 const BAD_GATEWAY: u32 = 502;
 const FORBIDDEN: u32 = 403;
@@ -15,13 +20,12 @@ const INTERNAL_SERVER_ERROR: u32 = 500;
 
 class GeoBlockRoot extends RootContext {
   createContext(context_id: u32): Context {
+    setLogLevel(LogLevelValues.info);
     return new GeoBlock(context_id, this);
   }
 }
 
 class GeoBlock extends Context {
-  allow: bool = true;
-
   constructor(context_id: u32, root_context: GeoBlockRoot) {
     super(context_id, root_context);
   }
@@ -65,6 +69,7 @@ class GeoBlock extends Context {
 
     const countryStr = String.UTF8.decode(country);
     if (blacklistedCountries.includes(countryStr)) {
+      log(LogLevelValues.info, "geoBlock: blocked request from " + countryStr);
       send_http_response(
         FORBIDDEN,
         "forbidden",
@@ -73,10 +78,12 @@ class GeoBlock extends Context {
       );
       return FilterHeadersStatusValues.StopIteration;
     }
+
+    log(LogLevelValues.info, "geoBlock: allowed request from " + countryStr);
     return FilterHeadersStatusValues.Continue;
   }
 }
 
 registerRootContext((context_id: u32) => {
   return new GeoBlockRoot(context_id);
-}, "geoblock");
+}, "geoBlock");

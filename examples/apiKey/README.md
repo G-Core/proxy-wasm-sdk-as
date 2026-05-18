@@ -16,6 +16,8 @@ In `onRequestHeaders`, the app:
 
 This is a simpler alternative to JWT validation when you need basic API authentication without token expiry or claims.
 
+> **Production note:** The key comparison (`providedKey !== expectedKey`) is not constant-time, which opens a timing side-channel for a high-volume attacker. For production use, replace the comparison with a constant-time HMAC equality check or use the `jwt` example which includes proper cryptographic validation.
+
 ## Configuration
 
 Set the following on your FastEdge application:

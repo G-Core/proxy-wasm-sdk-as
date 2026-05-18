@@ -46,9 +46,12 @@ class CacheControlContext extends Context {
     // Determine cache policy based on content type
     const contentType = stream_context.headers.response.get("Content-Type");
 
-    const staticMaxAge = getEnv("STATIC_MAX_AGE") || "31536000";
-    const htmlMaxAge = getEnv("HTML_MAX_AGE") || "3600";
-    const apiMaxAge = getEnv("API_MAX_AGE") || "0";
+    const rawStaticMaxAge = getEnv("STATIC_MAX_AGE");
+    const staticMaxAge = rawStaticMaxAge === "" ? "31536000" : rawStaticMaxAge;
+    const rawHtmlMaxAge = getEnv("HTML_MAX_AGE");
+    const htmlMaxAge = rawHtmlMaxAge === "" ? "3600" : rawHtmlMaxAge;
+    const rawApiMaxAge = getEnv("API_MAX_AGE");
+    const apiMaxAge = rawApiMaxAge === "" ? "0" : rawApiMaxAge;
 
     let cacheControl: string;
 

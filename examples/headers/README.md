@@ -16,6 +16,14 @@ In `onRequestHeaders` and `onResponseHeaders` the app:
 
 This is useful as a reference for understanding the add/remove/replace header API and the validation pattern.
 
+### Cross-phase header writes
+
+The `onRequestHeaders` hook also demonstrates writing **response** headers during the request phase. This is an advanced technique: `stream_context.headers.response.add(...)` can be called in either hook. Headers written in `onRequestHeaders` appear in the final response alongside those set in `onResponseHeaders`.
+
+### Multi-value headers
+
+`new-header-03` is deliberately added twice (`add` is called with the same name twice). This produces a multi-value header that reaches the upstream as two separate `new-header-03` entries. The validation pattern uses `Set<string>` of `"name:value"` pairs to assert both values are present.
+
 ### Known Issues
 
 Nginx does not allow deleting headers — calling `remove()` will set the header value to an empty string rather than removing it entirely.

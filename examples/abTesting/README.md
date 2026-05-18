@@ -15,6 +15,8 @@ In `onRequestHeaders`, the app:
 
 In `onResponseHeaders`, the app sets a `Set-Cookie` header to persist the variant assignment for subsequent requests (24-hour TTL).
 
+> **Note on variant assignment entropy:** New-visitor assignment uses `getCurrentTime() % 2` as a simple 50/50 source. This is illustrative — it is not sticky across two requests that arrive in the same millisecond and is not reproducible in tests. Production A/B implementations typically hash a stable visitor identifier (e.g. client IP or session token) for deterministic, sticky pre-cookie assignment.
+
 ## Configuration
 
 Set the following environment variables on your FastEdge application:

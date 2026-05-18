@@ -1,7 +1,7 @@
 {
   "expected": {
     "logs": [
-      "newUrl: http://example.com/a/landing",
+      "A/B routing: http://example.com/a/landing",
       "A/B test \"homepage-hero\": variant A, path /a/landing"
     ],
     "status": 200,
