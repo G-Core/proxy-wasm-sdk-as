@@ -1,9 +1,9 @@
 {
   "expected": {
-    "status": 200,
-    "contentType": "application/json",
-    "bodyContains": [
-      "\"requestUrl\":\"https://de-origin.example.com/test\""
+    "logs": [
+      "onRequestHeaders >>",
+      "Country code: ( DE ): https://de-origin.example.com",
+      "request-url: https://de-origin.example.com"
     ]
   }
 }

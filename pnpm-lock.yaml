@@ -161,6 +161,19 @@ importers:
         specifier: ^0.28.9
         version: 0.28.14
 
+  examples/httpCallTest:
+    dependencies:
+      '@gcoredev/proxy-wasm-sdk-as':
+        specifier: ^1.2.3
+        version: link:../..
+    devDependencies:
+      '@assemblyscript/wasi-shim':
+        specifier: ^0.1.0
+        version: 0.1.0
+      assemblyscript:
+        specifier: ^0.28.9
+        version: 0.28.14
+
   examples/jwt:
     dependencies:
       '@gcoredev/as-jwt':
