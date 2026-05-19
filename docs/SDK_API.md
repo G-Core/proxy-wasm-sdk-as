@@ -774,7 +774,13 @@ class MyContext extends Context {
 
     const result = (this.root_context as MyRootContext).httpCall(
       "api.example.com",
-      [makeHeaderPair("accept", "application/json")],
+      [
+        makeHeaderPair(":method", "GET"),
+        makeHeaderPair(":path", "/data"),
+        makeHeaderPair(":scheme", "https"),
+        makeHeaderPair(":authority", "api.example.com"),
+        makeHeaderPair("accept", "application/json"),
+      ],
       new ArrayBuffer(0),
       [],
       5000,

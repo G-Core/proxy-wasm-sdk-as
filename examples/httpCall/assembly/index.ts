@@ -86,7 +86,7 @@ class HttpCallContext extends Context {
     headers.push(makeHeaderPair(":method", "GET"));
     headers.push(makeHeaderPair("User-Agent", "fastedge"));
 
-    // 5000ms accommodates cold DNS + variable network conditions; tune per upstream in production.
+    // 3000ms accommodates cold DNS + variable network conditions; tune per upstream in production.
     const result = (this.root_context as HttpCallRoot).httpCall(
       "httpbin.org",
       headers,
