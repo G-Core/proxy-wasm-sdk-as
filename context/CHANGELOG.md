@@ -2,6 +2,47 @@
 
 Use `grep` to search this file — do not read linearly as it grows.
 
+## [2026-05-18] — Tier 2 + Tier 3 example fixes; AS constraint patterns confirmed
+
+### Overview
+Systematic validation pass over all 17 AS examples. Three cross-cutting AS compiler quirks confirmed and fixed. All 16 locally-runnable examples reach ✅ Local Test. fastedge-plugin `platform/as-constraints.md` created as a mandatory intelligence layer for AS CDN app generation.
+
+### Key Decisions
+
+**CC-02 APPLIED — AS nested functions with default params trap at runtime:**
+`properties/assembly/index.ts` — nested function `handleProperty` inside `onRequestHeaders` was compiled via `call_indirect` by AS; default params (`propertyName=""`, `headerName=""`) were not applied on indirect dispatch, leaving null-pointer slots that trapped on `.length` access. Fix: promoted to a `private` class method (direct call; defaults work correctly). This is now documented in `fastedge-plugin/platform/as-constraints.md` as a HIGH-value constraint.
+
+**CC-11 APPLIED — AS `||` is pointer-truthy on empty strings:**
+`a || "fallback"` returns `a` even when `a === ""` because the empty-string object has a non-zero pointer. Fix pattern: `a === "" ? "fallback" : a`. Confirmed in WAT analysis of `geoRedirect-debug.wat`. Applied to:
+- `geoRedirect` GR-C1: `countrySpecificOrigin || defaultOrigin` (fallback was silently broken in production)
+- `cacheControl` CC-C9: three `getEnv(...) || "default"` env-var fallbacks (masked by fixtures always providing non-empty values)
+Note: `!str` is safe — compiles to `String.__not` which handles both null and `""` correctly.
+
+**CC-10 RESOLVED — "Farq:" debug prefix in production example code:**
+Two log messages with a developer-handle prefix (`"Farq: -> ..."`) shipped in `abTesting` and `cors`. Both cleaned to production-quality log messages.
+
+**CC-08 + CC-09 RESOLVED upstream (fastedge-test@0.2.2):**
+- CC-08: runner now initialises an empty WASI env table for every proxy-wasm run regardless of dotenv config. `getEnv` no longer traps on uninitialized env; error-path fixtures (`missing-config`) are now locally runnable.
+- CC-09: `send_http_response` additional headers now merged into `localResponse.headers` and propagated to `FullFlowResult.finalResponse.headers`. `WWW-Authenticate` and similar headers asserted correctly.
+
+**as-constraints.md created in fastedge-plugin:**
+`fastedge-plugin/platform/as-constraints.md` — canonical AS constraint reference covering HIGH and MEDIUM value constraints (no closures over mutable state, no try/catch, explicit numerics, || truthy quirk, nested-function default-param trap, etc.). Wired as mandatory read in both `fastedge-docs/SKILL.md` and `scaffold/SKILL.md` so every AS CDN app generation pass reads it.
+
+### Changes
+- `examples/properties/assembly/index.ts` — `handleProperty` promoted to private class method (CC-02 fix); `setLogLevel(info)` added; error-code comment block + host-validation comment added.
+- `examples/geoRedirect/assembly/index.ts` — `||` fallback fixed (CC-11); all 4 debug logs changed to info; registration id `"georedirect"` → `"geoRedirect"`; no-op Host replace removed.
+- `examples/cacheControl/assembly/index.ts` — three `||` env-var fallbacks fixed (CC-11).
+- `examples/geoBlock/assembly/index.ts` — dead field removed; `setLogLevel(info)` added; audit logs added on block + allow paths; registration id `"geoblock"` → `"geoBlock"`.
+- `examples/variablesAndSecrets/assembly/index.ts` — log level debug→info; password log changed to `"PASSWORD: [set, length N]"`.
+- `examples/abTesting/assembly/index.ts` — Farq prefix removed (CC-10).
+- `examples/cors/assembly/index.ts` — Farq prefix removed (CC-10).
+- `examples/properties/README.md` — host validation note; error code → property table; optional-property note; Expected output section added.
+- READMEs updated (8 total): helloWorld, headers, abTesting, apiKey, logTime, variablesAndSecrets, geoBlock, geoRedirect.
+- `context/EXAMPLE_VALIDATION.md` — Tier 2 + Tier 3 log entries; properties code + README review completed.
+- `fastedge-plugin/platform/as-constraints.md` — created with HIGH + MEDIUM constraints.
+
+---
+
 ## [2026-05-13] — CC-04 resolved: production `.replace()` is UPSERT
 
 ### Overview

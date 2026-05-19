@@ -12,8 +12,6 @@ In `onRequestHeaders` and `onResponseHeaders`, the app calls `getCurrentTime()` 
 
 This is a minimal example useful as a starting point for timing and performance logging.
 
-> **Note:** The helper function is named `printCurrentDate` but it returns a formatted string — it does not print. Consider naming it `formatCurrentDate` or `getCurrentDateString` in your own code.
-
 > **Computing elapsed time:** To measure handler latency, capture `getCurrentTime()` in `onRequestHeaders`, pass it to the upstream via a request property or header, then subtract in `onResponseHeaders`: `const elapsedMs = getCurrentTime() - requestStartMs;`. Note that `getCurrentTime()` returns milliseconds, so sub-millisecond requests will show 0.
 
 > **UTC only:** `toISOString()` always produces UTC. If your team works in a specific timezone, apply a millisecond offset before formatting.

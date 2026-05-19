@@ -25,29 +25,22 @@ class CorsContext extends Context {
     super(context_id, root_context);
   }
 
+  private isOriginAllowed(origin: string, allowedOrigins: string): bool {
+    if (allowedOrigins === "" || allowedOrigins === "*") return true;
+    const origins = allowedOrigins.split(",");
+    for (let i = 0; i < origins.length; i++) {
+      if (origins[i].trim() == origin) return true;
+    }
+    return false;
+  }
+
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     const allowedOrigins = getEnv("ALLOWED_ORIGINS");
     const origin = stream_context.headers.request.get("Origin");
     log(LogLevelValues.info, "onRequestHeaders >> origin: " + origin);
 
-    if (origin === "") {
-      return FilterHeadersStatusValues.Continue;
-    }
-
-    // Check if the origin is allowed
-    if (allowedOrigins !== "" && allowedOrigins !== "*") {
-      const origins = allowedOrigins.split(",");
-      let found = false;
-      for (let i = 0; i < origins.length; i++) {
-        if (origins[i].trim() == origin) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        log(LogLevelValues.info, "CORS: origin not allowed: " + origin);
-        return FilterHeadersStatusValues.Continue;
-      }
+    if (origin !== "" && !this.isOriginAllowed(origin, allowedOrigins)) {
+      log(LogLevelValues.info, "CORS: origin not allowed: " + origin);
     }
 
     // OPTIONS preflights are answered by the FastEdge edge layer before this
@@ -60,23 +53,8 @@ class CorsContext extends Context {
     const allowedOrigins = getEnv("ALLOWED_ORIGINS");
     const origin = stream_context.headers.request.get("Origin");
 
-    if (origin === "") {
+    if (origin === "" || !this.isOriginAllowed(origin, allowedOrigins)) {
       return FilterHeadersStatusValues.Continue;
-    }
-
-    // Verify origin is allowed
-    if (allowedOrigins !== "" && allowedOrigins !== "*") {
-      const origins = allowedOrigins.split(",");
-      let found = false;
-      for (let i = 0; i < origins.length; i++) {
-        if (origins[i].trim() == origin) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        return FilterHeadersStatusValues.Continue;
-      }
     }
 
     const effectiveOrigin = allowedOrigins === "*" ? "*" : origin;

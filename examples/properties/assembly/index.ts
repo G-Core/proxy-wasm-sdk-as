@@ -11,6 +11,9 @@ import {
   set_property,
   stream_context,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
+import {
+  setLogLevel,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
 const REQUEST_URI = "request.url";
 const REQUEST_HOST = "request.host";
@@ -24,6 +27,7 @@ const REQUEST_CITY = "request.city";
 
 class PropertiesRoot extends RootContext {
   createContext(context_id: u32): Context {
+    setLogLevel(LogLevelValues.info);
     return new Properties(context_id, this);
   }
 }
@@ -34,10 +38,13 @@ class Properties extends Context {
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
+    // Error codes 551–559 identify the absent property via the HTTP response status:
+    // 551=uri 552=host 553=path 554=scheme 555=extension 556=query 557=x_real_ip 558=country 559=city
     if (!this.handleProperty(REQUEST_URI, 551, "uri", "request-uri")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
+    // host must be present for upstream routing; validated but not logged or exposed as a response header
     if (!this.handleProperty(REQUEST_HOST, 552)) {
       return FilterHeadersStatusValues.StopIteration;
     }

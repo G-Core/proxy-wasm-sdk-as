@@ -69,28 +69,28 @@ Legend: ✅ pass · ⚠️ pass-with-issues · ❌ fail · 🟡 in-progress · �
 
 | Example | Build | `.test.json` | `.live.json` coverage | Local Test | Code Review | README Review | Live Candidate | Live Test | Sign-off |
 |---|---|---|---|---|---|---|---|---|---|
-| [helloWorld](../examples/helloWorld/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [headers](../examples/headers/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [body](../examples/body/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | — |
-| [variablesAndSecrets](../examples/variablesAndSecrets/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [logTime](../examples/logTime/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [properties](../examples/properties/) | ✅ | 1 | 1/1 | ✅ | ⬜ | ⬜ | — | — | — |
+| [helloWorld](../examples/helloWorld/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [headers](../examples/headers/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [body](../examples/body/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | 2026-05-19 |
+| [variablesAndSecrets](../examples/variablesAndSecrets/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [logTime](../examples/logTime/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [properties](../examples/properties/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 
 ### Full Examples
 
 | Example | Build | `.test.json` | `.live.json` coverage | Local Test | Code Review | README Review | Live Candidate | Live Test | Sign-off |
 |---|---|---|---|---|---|---|---|---|---|
-| [abTesting](../examples/abTesting/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [apiKey](../examples/apiKey/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [cacheControl](../examples/cacheControl/) | ✅ | 7 | 7/7 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | — |
-| [cors](../examples/cors/) | ✅ | 3 (+wildcard) | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [customErrorPages](../examples/customErrorPages/) | ✅ | 6 | 6/6 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [geoBlock](../examples/geoBlock/) | ✅ | 3 | 3/3 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [geoRedirect](../examples/geoRedirect/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [httpCall](../examples/httpCall/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | — |
-| [jwt](../examples/jwt/) | ✅ | 5 (authored) | 5/5 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [abTesting](../examples/abTesting/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [apiKey](../examples/apiKey/) | ✅ | 4 | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [cacheControl](../examples/cacheControl/) | ✅ | 7 | 7/7 | ✅ | ⚠️ | ⚠️ | ✓ done | ✅ probe | 2026-05-19 |
+| [cors](../examples/cors/) | ✅ | 3 (+wildcard) | 4/4 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [customErrorPages](../examples/customErrorPages/) | ✅ | 6 | 6/6 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [geoBlock](../examples/geoBlock/) | ✅ | 3 | 3/3 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [geoRedirect](../examples/geoRedirect/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [httpCall](../examples/httpCall/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
+| [jwt](../examples/jwt/) | ✅ | 5 (authored) | 5/5 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 | [kvStore](../examples/kvStore/) | ✅ | 0 | 0/0 | 🚫 runner gap | ⬜ | ⬜ | ✓ required | — | — |
-| [largeDictionary](../examples/largeDictionary/) | ✅ | 2 (+.env) | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | — |
+| [largeDictionary](../examples/largeDictionary/) | ✅ | 2 (+.env) | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 
 **Assertion authoring status:** **16 / 17 examples have authored `.live.json` coverage** (all except kvStore). kvStore is deferred to Phase 2 (live-test only) per CC-12 (runner doesn't implement KV API). Phase 1 fixture authoring is **complete**. Note: per the cross-cutting finding below, the pre-authored 4 (helloWorld/headers/logTime/properties) were **claimed** coverage, not verified — headers needed rewriting once the comparator ran it.
 
@@ -182,6 +182,14 @@ Append entries under each example. Format:
 
 **Next action:** **needs-rework** before sign-off — README rework (HW-R1/R2/R3) is the higher-value item; HW-C1 is a one-line decision.
 
+#### 2026-05-18 — Tier 3 README pass
+
+**README Review:** ✅ — HW-R1 resolved (added "What it does" section: four hooks, INFO logs, pass-through behavior); HW-R2 resolved (Deploy section + build output table added); HW-R3 resolved (expected log output documented). Full rewrite.
+
+**Code Review:** ⚠️ — HW-C1 still open: no `setLogLevel(...)` call. Convention decision deferred — minimality in the scaffolding skeleton may be intentional.
+
+**Next action:** polish-only — HW-C1 (one-line `setLogLevel` decision) is the only remaining item.
+
 ### headers
 
 #### 2026-05-13 — comparator pilot (Phase 0 / Task #6)
@@ -221,6 +229,14 @@ Append entries under each example. Format:
 - **HE-R3:** No mention of the validation pattern (`validateHeaders` symmetric-diff self-check) as a teaching artifact — the example is doing real-world test-in-production style validation and that's worth highlighting.
 
 **Next action:** **needs-rework** — HE-R1/R2/R3 (README enhancements) plus consider HE-C1 (deduplication decision). HE-C2/C4/C5 are polish.
+
+#### 2026-05-18 — Tier 3 README pass
+
+**README Review:** ⚠️ — HE-R1 resolved (cross-phase response-header write noted in a dedicated blockquote). HE-R2 resolved (multi-value headers called out as a teaching point with `add()` explanation). HE-R3 (validateHeaders pattern explanation) still open — minor.
+
+**Code Review:** ⚠️ — HE-C1 (deduplication of request/response hook bodies), HE-C4 (Set encoding comment), HE-C5 (unused param naming) still open — polish.
+
+**Next action:** polish-only — no blocking items remaining.
 
 ### body
 
@@ -285,6 +301,16 @@ CC-04 resolution: live-confirmed UPSERT on edge (see cross-cutting findings belo
 
 Possible cross-cutting candidate: **CC-05** — secret-logging antipattern. Check upcoming examples that use `getSecret` (likely `apiKey`, `jwt`) for the same pattern.
 
+#### 2026-05-18 — Tier 3 code + README pass
+
+**Code Review:** ⚠️ — V-C1 resolved: password log now emits `"PASSWORD: [set, length N]"` instead of the raw value. V-C4 resolved: `setLogLevel` changed from `debug` to `info`. V-C2 (class naming omits "Secrets") and V-C3 (no empty-value guard on getEnv/getSecret) still open — polish.
+
+**README Review:** ⚠️ — V-R1 resolved (security warning blockquote added: no verbatim secret logging in production, limit forwarding to systems that need it). V-R2 resolved (local testing section added: `.env` setup, FASTEDGE_VAR_ENV_*/FASTEDGE_VAR_SECRET_* naming convention). V-R3 (sample upstream JSON response) still open — minor.
+
+**Local Test:** ✅ — 1/1 still passing; `.live.json` updated to assert `"PASSWORD: [set, length 15]"`.
+
+**Next action:** polish-only — meaningful security items resolved.
+
 ### logTime
 
 #### 2026-05-13 — comparator pilot (Phase 0 / Task #6)
@@ -311,6 +337,22 @@ Possible cross-cutting candidate: **CC-05** — secret-logging antipattern. Chec
 - **LT-R3 (Minor):** `toISOString()` produces UTC — worth noting since CDN engineers may want local-time logs for debugging.
 
 **Next action:** **needs-rework** — LT-C2 (rename) and LT-R2 (use-case worked example) are the meaningful items; LT-C1/C3/R3 are polish.
+
+#### 2026-05-18 — Tier 3 README pass
+
+**README Review:** ⚠️ — LT-R2 resolved (elapsed-time worked example added: capture `getCurrentTime()` in request hook, subtract in response hook; note on ms granularity for sub-ms requests). LT-R3 resolved (UTC-only note added). LT-R1 remains positive.
+
+**Code Review:** ⚠️ — LT-C2 still open: `printCurrentDate()` misleading name (returns a string, doesn't print). README now has a caveat blockquote; code rename deferred. LT-C1 (no `setLogLevel`) and LT-C3 (scope: two timestamps but no computation) still open.
+
+**Next action:** LT-C2 code rename is the only meaningful remaining item; README is complete.
+
+#### 2026-05-19 — LT-C2 fix
+
+**Code Review:** ⚠️ — LT-C2 resolved: `printCurrentDate()` renamed to `getCurrentDateString()` throughout (declaration + 2 call sites). README caveat blockquote removed (no longer needed). LT-C1 (no `setLogLevel`) and LT-C3 (no elapsed-time computation in the source) remain — polish.
+
+**Local Test:** ✅ — 1/1 still passing after rebuild.
+
+**Next action:** polish-only — all meaningful items resolved.
 
 ### properties
 
@@ -361,6 +403,47 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 
 **Next action:** Code review and README review still pending (⬜).
 
+#### 2026-05-18 — code + README review
+
+**Code Review:** ⚠️ — pass-with-issues (4 findings)
+**README Review:** ⚠️ — pass-with-issues (4 findings)
+
+**Findings — Code Review (`assembly/index.ts`):**
+
+- **PR-C1 (CC-06 — no `setLogLevel`):** No `setLogLevel(LogLevelValues.info)` call in `PropertiesRoot.createContext`. All `log()` calls use info-level so they're visible, but inconsistent with the cross-cutting convention. One-liner fix.
+- **PR-C2 (Design clarity — silent host validation):** Line 41 — `this.handleProperty(REQUEST_HOST, 552)` is called without `propertyName` or `headerName`. With those defaulting to `""`, the method validates that `request.host` is present (returns 552 if absent) but never logs it and never adds a response header. Likely intentional (host must exist for the request to route), but reads as an incomplete call without a comment. `REQUEST_HOST` is also absent from the README property table (PR-R1).
+- **PR-C3 (Diagnostic status codes — no comment):** Codes 551–559 are passed directly as HTTP status codes to `send_http_response`. The scheme is clever (status code alone identifies which property is absent), but no comment maps code → property, and the status line `"internal server error"` is generic rather than diagnostic.
+- **PR-C4 (Incomplete demonstration):** Lines 74–100 parse query params and override `request.url`, `request.host`, and `request.path` via `?url=...&host=...&path=...`. This is the most interesting part of the example (`set_property` usage), but no fixture exercises it — the existing fixture sends `?test=value` which doesn't trigger any override.
+
+**AS compliance:** Clean. `.map<Array<string>>((pair) => pair.split("="))` at line 80 is a pure lambda (no outer capture — fine in AS). No `||` string fallbacks, no try/catch, explicit `u32` types. `handleProperty` is now a `private` class method with correct default-param dispatch (Tier 2 fix).
+
+**Findings — README Review:**
+
+- **PR-R1 (`request.host` absent from table):** The property table lists 8 properties but omits `request.host`. Since the code validates its presence and returns 552 on absence, a user who hits this case has no README reference for what 552 means. Pairs with PR-C2 and PR-C3.
+- **PR-R2 (Error code mapping not documented):** "a numeric error code is returned" is mentioned but the mapping (551=uri, 552=host, 553=path, 554=scheme, 555=extension, 556=query, 557=x_real_ip, 558=country, 559=city) is absent. A user hitting a 555 needs to know what it means without reading source.
+- **PR-R3 (No fixture for override feature):** The `url=`/`host=`/`path=` query-param override is mentioned in one sentence but there is nothing showing expected behavior or a sample fixture. For the example to teach `set_property`, this needs to be demonstrable.
+- **PR-R4 (No expected log output):** For a diagnostic example, showing the expected log lines (`onRequestHeaders >> uri: ...`, `onRequestHeaders >> country: LU`, etc.) would be the most useful addition. Currently absent.
+
+**Next action:** PR-C2/PR-R1 (host validation transparency), PR-C3/PR-R2 (error code table), and PR-R4 (expected logs) are the meaningful items. PR-C4/PR-R3 (fixture for set_property override) would be a nice addition but is out of scope for the current pass. PR-C1 is a one-liner.
+
+#### 2026-05-18 — PR-C2/C3/R1/R2/R4 fixes applied
+
+**Code Review:** ⚠️ — PR-C2 resolved: comment added explaining host is validated for routing but not logged or exposed. PR-C3 resolved: comment block at top of `onRequestHeaders` maps codes 551–559 to property names. PR-C1 (no `setLogLevel`) and PR-C4 (no fixture for override feature) still open.
+
+**README Review:** ⚠️ — PR-R1 resolved: `request.host` added to property table as `*(validated only)*` with explanatory note. PR-R2 resolved: error code → property table added (including note that 555/556 are never triggered since extension/query are optional). PR-R4 resolved: "Expected output" section added with the 9 INFO log lines from the happy-path fixture. PR-R3 still open.
+
+**Local Test:** ✅ — 1/1 still passing after rebuild.
+
+**Next action:** PR-C1 (one-liner `setLogLevel`) is the only remaining code item. PR-R3 (fixture for override) is out of scope for current pass.
+
+#### 2026-05-18 — PR-C1 fixed
+
+**Code Review:** ⚠️ — PR-C1 resolved: `setLogLevel(LogLevelValues.info)` added in `PropertiesRoot.createContext`; `setLogLevel` import added from `assembly/fastedge`. PR-C4 (no fixture for `set_property` override) is the only remaining open item — deferred.
+
+**Local Test:** ✅ — 1/1 still passing after rebuild.
+
+**Next action:** polish-only — PR-C4/PR-R3 (override fixture) is the only open item and is out of scope for current pass.
+
 ### abTesting
 
 #### 2026-05-13 — full validation pass
@@ -403,6 +486,16 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 **Local Test:** ✅ — 4/4 fixtures pass (including `missing-config`). The WASI env fix in 0.2.2 correctly initialises an empty env table when no dotenv is configured — `getEnv` no longer traps; the example's own `if (experimentName === "")` guard now fires cleanly and produces the expected 500 response.
 **Next action:** needs-rework still applies for AB-C1 + AB-C2.
 
+#### 2026-05-18 — Tier 3 code + README pass
+
+**Code Review:** ⚠️ — AB-C1 resolved: `Farq:` debug prefix removed; log now reads `"A/B routing: ${newUrl}"`. AB-C2 decision taken: README documents the limitation (illustrative entropy source) rather than changing the implementation. AB-C3 through AB-C8 still open — polish.
+
+**README Review:** ⚠️ — AB-R1 resolved: blockquote added noting that `getCurrentTime() % 2` assignment is illustrative (not sticky, not reproducible in tests; production should hash a stable visitor identifier). AB-R2/AB-R3 still open — minor.
+
+**Local Test:** ✅ — 4/4 still passing; `.live.json` files updated to assert `"A/B routing: ..."` log prefix.
+
+**Next action:** polish-only — no meaningful blockers remaining.
+
 ### apiKey
 
 #### 2026-05-13 — full validation pass
@@ -443,6 +536,24 @@ The function body then loads `propertyName` (= 0), calls `String#get:length` whi
 
 **Local Test:** ✅ — 4/4 fixtures pass (including `missing-header`). The `mergedHeaders` fix in 0.2.2 propagates `send_http_response` additional headers into `localResponse` and through to `FullFlowResult.finalResponse.headers`. `WWW-Authenticate: API-Key` now asserts correctly.
 **Next action:** needs-rework still applies for AK-C4 + AK-C6/AK-R2.
+
+#### 2026-05-18 — Tier 3 README pass
+
+**README Review:** ⚠️ — AK-R1 resolved: production note blockquote added (non-constant-time comparison is a timing side-channel; suggests constant-time HMAC equality or the `jwt` example). AK-R2 (`.remove()` empty-value semantics) and AK-R3 (jwt cross-link) still open — minor.
+
+**Code Review:** ⚠️ — AK-C4 (timing attack: README note added, code comparison unchanged), AK-C6 (`.remove()` sets empty value rather than deleting header — README still claims full deletion) still open.
+
+**Next action:** AK-C6/AK-R2 (`.remove()` semantics vs. README claim) is the remaining meaningful item.
+
+#### 2026-05-19 — AK-C6/AK-R2 fix
+
+**Code Review:** ⚠️ — AK-C6 resolved: inline comment added explaining `.remove()` sets the header to empty string rather than deleting it. AK-C4 (non-constant-time comparison) remains — acknowledged; README note already present.
+
+**README Review:** ⚠️ — AK-R2 resolved: step 5 updated to say "clears" + parenthetical noting the empty-string semantics. AK-R3 (jwt cross-link) still open — minor.
+
+**Local Test:** ✅ — 4/4 still passing (code change is comment-only; no rebuild needed).
+
+**Next action:** polish-only — all meaningful items resolved.
 
 ### cacheControl
 
@@ -496,6 +607,14 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 
 **Next action:** **CC-04 RESOLVED (UPSERT, 2026-05-13).** Path (a) taken — accept code as-is, headers-example comment needs correction. Remaining items (CC-C2 status decoding, CC-C5 Vary docs, CC-C8 case-sensitive lookup, CC-C9 `||` fallback) are unrelated polish.
 
+#### 2026-05-18 — Tier 3 code pass
+
+**Code Review:** ⚠️ — CC-C9 resolved: three `getEnv(...) || "default"` patterns replaced with explicit `=== "" ?` guards for STATIC_MAX_AGE, HTML_MAX_AGE, and API_MAX_AGE. Fallback now fires correctly when an env var is set to an empty string. CC-C2, CC-C5, CC-C8 still open — polish.
+
+**Local Test:** ✅ — 7/7 still passing.
+
+**Next action:** polish-only — CC-C9 (the only correctness-affecting open item) resolved.
+
 ### cors
 
 #### 2026-05-13 — full validation pass
@@ -528,6 +647,22 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 - **CO-R5 (`*` + credentials caveat):** When Access-Control-Allow-Origin is `*`, credentials cannot be set (CORS spec). README doesn't mention this when describing wildcard.
 
 **Next action:** **needs-rework** — CO-C1 (Farq cleanup) and CO-C2 (dedup) are the high-value items. The README is mostly good; CO-R3/R5 are useful additions but minor.
+
+#### 2026-05-18 — Tier 3 code pass
+
+**Code Review:** ⚠️ — CO-C1 resolved: `Farq:` debug prefix removed; log now reads `"onRequestHeaders >> origin: " + origin`. CO-C2 (duplicated allow-list logic across request and response hooks), CO-C4, CO-C5, CO-C7, CO-C9 still open — polish/design decisions.
+
+**Local Test:** ✅ — 4/4 still passing; `.live.json` files updated to assert `"onRequestHeaders >> origin: ..."` log prefix.
+
+**Next action:** CO-C2 (dedup decision: extract `isOriginAllowed` or drop the dead request-side check) is the remaining design item; CO-C1 (the cosmetic blocker) resolved.
+
+#### 2026-05-19 — CO-C2 fix
+
+**Code Review:** ⚠️ — CO-C2 resolved: `private isOriginAllowed(origin, allowedOrigins)` extracted; both `onRequestHeaders` and `onResponseHeaders` now call it — duplicated split/iterate/compare logic removed. Behavior is identical; all existing log assertions preserved. CO-C4, CO-C5, CO-C7, CO-C9 still open — polish.
+
+**Local Test:** ✅ — 4/4 still passing after rebuild.
+
+**Next action:** polish-only — all meaningful items resolved.
 
 ### customErrorPages
 
@@ -603,6 +738,16 @@ The builtin response generator (also in fastedge-test) sets only `content-type` 
 **Local Test:** ✅ — 3/3 fixtures pass (including `missing-config`). Same fix as abTesting — `getEnv` no longer traps on uninitialized WASI env; example's `if (!blacklist) { send 500 }` error path now reachable and produces the correct response.
 **Next action:** needs-rework still applies for GB-C1 + GB-C3 + GB-C10.
 
+#### 2026-05-18 — Tier 3 code + README pass
+
+**Code Review:** ⚠️ — GB-C1 resolved (dead `allow: bool = true` field removed). GB-C2 resolved (`setLogLevel(LogLevelValues.info)` added in `GeoBlockRoot.createContext`). GB-C3 resolved (audit logs added on block path: `"geoBlock: blocked request from " + countryStr`; and allow path: `"geoBlock: allowed request from " + countryStr`). GB-C10 resolved (registration id changed from `"geoblock"` to `"geoBlock"`). GB-C5 (unreachable empty-array branch), GB-C7 (case-sensitive country compare), GB-C9 (502 status for missing geo info) still open — polish.
+
+**README Review:** ⚠️ — GB-R2 resolved (case-sensitivity blockquote added: FastEdge provides uppercase codes; ensure BLACKLIST uses uppercase). GB-R3 resolved (Geo-IP data source made explicit in "What it does"). GB-R4 resolved (both block and allow audit log lines described). GB-R1 remains positive.
+
+**Local Test:** ✅ — 3/3 still passing; new log assertions verified against runner output.
+
+**Next action:** polish-only — all meaningful items resolved.
+
 ### geoRedirect
 
 #### 2026-05-13 — full validation pass
@@ -655,6 +800,16 @@ Promoted AS truthy/falsy semantics to **CC-11**.
 **Code Review:** ⚠️ — Critical bugs resolved. Remaining items: GR-C3 (all logs at DEBUG, filtered by setLogLevel(info) — zero runtime visibility), GR-C7 (no URL validation), GR-C8 (502 for missing-country is a dubious status choice). GR-R2 resolved by the fix (README now accurately describes behavior). GR-R3/R4 still minor issues.
 
 **Next action:** README review still ⚠️. GR-C3 (log levels) is worth addressing if a Tier 3 pass touches this example.
+
+#### 2026-05-18 — Tier 3 code + README pass
+
+**Code Review:** ⚠️ — GR-C3 resolved: all four `log(LogLevelValues.debug, ...)` calls changed to `LogLevelValues.info`; logs are now visible at runtime. Bonus fix: `||` in the log template string also corrected (`countrySpecificOrigin === "" ? "no matching origin" : countrySpecificOrigin`). GR-C7 (no URL validation) and GR-C8 (502 status for missing country info) still open — acknowledged polish items.
+
+**README Review:** ⚠️ — GR-R2 previously resolved by the GR-C1 code fix (fallback now works as documented). GR-R3 resolved: routing mechanism blockquote added (not an HTTP 302; `request.url` property rewrite is transparent to the client — returns a 200). GR-R4 resolved: observability blockquote added (logs country code, matched origin, and final URL at INFO level). GR-R1 remains positive.
+
+**Local Test:** ✅ — 2/2 still passing.
+
+**Next action:** polish-only — GR-C7/GR-C8 are acknowledged but not blocking.
 
 ### httpCall
 
@@ -727,6 +882,16 @@ Promoted AS truthy/falsy semantics to **CC-11**.
 
 **Next action:** **needs-rework** — JT-C1 (remove dead field), JT-C2 (rename to UPPERCASE), JT-C3 (drop redundant check), JT-C4 (proper Bearer scheme parsing). All small, surgical fixes.
 
+#### 2026-05-19 — JT-C1/C2/C3/C4 fixes; README updated
+
+**Code Review:** ⚠️ — JT-C1 resolved: dead `allow: bool = false` field removed. JT-C2 resolved: `getSecret("secret")` → `getSecret("SECRET")`; `.env` updated to `FASTEDGE_VAR_SECRET_SECRET=...`. JT-C3 resolved: redundant `if (authHeader.length == 0)` block dropped (the preceding `if (!authHeader)` already handles empty strings via `String.__not`). JT-C4 resolved: `authHeader.replace("Bearer ", "")` replaced with explicit `startsWith("Bearer ")` check + `slice(7)`; non-Bearer requests now get a clear 401 "Authorization header must use Bearer scheme".
+
+**README Review:** ⚠️ — JT-R2 resolved: secret name updated to `SECRET` throughout (What it does step 1, Configuration table, Deploy section). JT-R4 resolved by the JT-C4 fix (Bearer scheme requirement is now enforced in code; README step 2 updated to describe this). JT-R3 (expected log lines for Expired/Bad Token) still open — minor.
+
+**Local Test:** ✅ — 5/5 still passing after rebuild. All existing fixture inputs use valid `Bearer eyJ...` tokens, so no fixture changes were needed.
+
+**Next action:** polish-only — all meaningful items resolved.
+
 ### kvStore
 
 #### 2026-05-13 — skipped for local validation (CC-12 runner gap)
@@ -777,6 +942,20 @@ This makes `getDictionary` not just a "use for >64KB values" alternative but als
 - **LD-R4:** Mentions "large JSON configs, PEM certificates, policy documents" as use cases but doesn't include a concrete sample for any.
 
 **Next action:** **could sign off after minor polish** — LD-C5 is opinion-level; LD-R2/R3/R4 are nice-to-haves. This is the cleanest row in the validation grid so far. Mark candidate for sign-off once CC-07 README template lands.
+
+---
+
+## Sign-off Pass — 2026-05-19
+
+**Method:** Full fixture-validator sweep across all 16 locally-testable examples in one run. `httpCall` produced one transient network failure (httpbin.org unreachable) then passed on immediate retry — confirmed external-dependency flakiness (HC-C2), not a code regression.
+
+**Result:** 44/45 fixtures pass on first run; 45/45 on retry. All 16 examples signed off.
+
+**Sign-off bar applied:** ⚠️ (pass-with-issues) accepted on Code Review and README Review. All columns with ⚠️ have only polish-level open items — no unresolved needs-rework findings remain. This bar was agreed at session start.
+
+**kvStore** remains unsigned — Phase 2 (live-test only, CC-12 runner gap). Sign-off pending live deploy parity.
+
+**Phase 1 complete.** Branch `feature/more-examples-httpbin` is ready for merge to `master` subject to Phase 2 (optional live-deploy parity check on selected examples) and final PR review.
 
 ---
 
@@ -945,4 +1124,4 @@ This is purely cosmetic but should not ship — example code is copied and these
 
 ---
 
-**Last Updated:** 2026-05-18 (Tier 2 complete: properties AS call_indirect bug fixed → 1/1 ✅; geoRedirect AS || bug + registration id + host-replace removed → 2/2 ✅; as-constraints.md created in fastedge-plugin; 17/17 examples have authored fixtures; 16/17 ✅ Local Test — kvStore deferred to Phase 2)
+**Last Updated:** 2026-05-19 (Phase 1 complete — 16/17 examples signed off 2026-05-19. kvStore Phase 2 only. Branch feature/more-examples-httpbin ready for merge subject to Phase 2 live-deploy parity check.)

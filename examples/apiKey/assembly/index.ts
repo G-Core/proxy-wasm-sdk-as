@@ -70,7 +70,8 @@ class ApiKeyContext extends Context {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    // Strip the API key header before forwarding to upstream
+    // .remove() sets the header value to "" rather than deleting it entirely —
+    // the upstream will see X-API-Key: "" rather than a missing header.
     stream_context.headers.request.remove("X-API-Key");
 
     log(LogLevelValues.info, "API key validated successfully");

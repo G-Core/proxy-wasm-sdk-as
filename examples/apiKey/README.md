@@ -12,7 +12,7 @@ In `onRequestHeaders`, the app:
 2. Checks the `X-API-Key` request header.
 3. Returns `401 Unauthorized` if the header is missing.
 4. Returns `403 Forbidden` if the key does not match.
-5. On success, strips the `X-API-Key` header before forwarding to the upstream origin.
+5. On success, clears the `X-API-Key` header before forwarding to the upstream origin (proxy-wasm `.remove()` sets the header value to an empty string rather than deleting it).
 
 This is a simpler alternative to JWT validation when you need basic API authentication without token expiry or claims.
 
