@@ -1,0 +1,12 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Non-existent store name — exercises KvStore.open() returning null on live edge",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/?store=nonexistent-store&action=get&key=foo",
+    "headers": {
+      "host": "example.com"
+    },
+    "body": ""
+  }
+}

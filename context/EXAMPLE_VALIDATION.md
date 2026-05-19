@@ -89,10 +89,10 @@ Legend: ✅ pass · ⚠️ pass-with-issues · ❌ fail · 🟡 in-progress · �
 | [geoRedirect](../examples/geoRedirect/) | ✅ | 2 | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 | [httpCall](../examples/httpCall/) | ✅ | 1 | 1/1 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 | [jwt](../examples/jwt/) | ✅ | 5 (authored) | 5/5 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
-| [kvStore](../examples/kvStore/) | ✅ | 0 | 0/0 | 🚫 runner gap | ⬜ | ⬜ | ✓ required | — | — |
+| [kvStore](../examples/kvStore/) | ✅ | 2 (authored) | 2/2 | 🚫 runner gap (CC-12) | ⚠️ | ⚠️ | ✓ done | ✅ 2/2 | 2026-05-19 |
 | [largeDictionary](../examples/largeDictionary/) | ✅ | 2 (+.env) | 2/2 | ✅ | ⚠️ | ⚠️ | — | — | 2026-05-19 |
 
-**Assertion authoring status:** **16 / 17 examples have authored `.live.json` coverage** (all except kvStore). kvStore is deferred to Phase 2 (live-test only) per CC-12 (runner doesn't implement KV API). Phase 1 fixture authoring is **complete**. Note: per the cross-cutting finding below, the pre-authored 4 (helloWorld/headers/logTime/properties) were **claimed** coverage, not verified — headers needed rewriting once the comparator ran it.
+**Assertion authoring status:** **17 / 17 examples have authored `.live.json` coverage.** kvStore's 2 error-path fixtures were authored in Phase 2 (local runner can't exercise KV API per CC-12). All fixture authoring is **complete**. Note: per the cross-cutting finding below, the pre-authored 4 (helloWorld/headers/logTime/properties) were **claimed** coverage, not verified — headers needed rewriting once the comparator ran it.
 
 ---
 
@@ -135,7 +135,9 @@ When every Sign-off cell has a date, recommend merge of `feature/more-examples-h
 
 | Example | API Category Covered | Rationale |
 |---|---|---|
-| _tbd_ | _tbd_ | _tbd_ |
+| `body` | Body manipulation, response header mutation, `.replace()` upsert semantics | CC-04 probe (2026-05-13) — disambiguated `.replace()` = upsert on live edge; first confirmed live parity |
+| `cacheControl` | Cache-Control response headers, env-var driven policy, multi-path routing | CC-04 probe (2026-05-13) — confirmed all 4 `.replace("Cache-Control", ...)` call sites upsert; cleanest cache-policy demonstration |
+| `kvStore` | KV Store API (`KvStore.open`, error paths), `onResponseBody` body replacement | Required — only KV demonstration; runner has no KV host-call support (CC-12) so live-only validation was the only option |
 
 ---
 
@@ -907,6 +909,46 @@ Promoted AS truthy/falsy semantics to **CC-11**.
 
 Promoted to **CC-12** below.
 
+#### 2026-05-19 — Phase 2 live-test + code + README review
+
+**Fixtures authored (Phase 2):**
+- `fixtures/no-params.test.json` — GET with no query params → error path
+- `fixtures/unknown-store.test.json` — GET `?store=nonexistent-store&action=get&key=foo` → KvStore.open() returns null
+- `fixtures/no-params.live.json` — `contentType: application/json` + `bodyContains: "App must be called with query parameters"`
+- `fixtures/unknown-store.live.json` — `contentType: application/json` + `bodyContains: "Failed to open KvStore"`
+- `fixtures/livetest.config.json` — CDN resource 2296532, rule prefix `/livetest-`
+
+**Live infrastructure:** app `kv-store` (813659), binary 595194, rule `livetest-kv-store` (22138189) on resource 2296532, CNAME `cdn.godronus.xyz`.
+
+**Live Test:** ✅ — 2/2 scenarios pass on live edge (binary 595194)
+- `no-params`: `content-type: application/json` ✅, `"App must be called with query parameters"` in body ✅, `[INFO]: App must be called with query parameters` in logs ✅
+- `unknown-store`: `content-type: application/json` ✅, `"Failed to open KvStore: 'nonexistent-store'"` in body ✅, `[INFO]: Failed to open KvStore: 'nonexistent-store'` in logs ✅
+
+INFO log visibility confirmed — the earlier binary (595153) had `LogLevelValues.debug` calls that were silently filtered; 595194 uses `LogLevelValues.info` throughout.
+
+**Code Review:** ⚠️ — pass-with-issues (findings below)
+
+**Findings — Code Review (`assembly/index.ts` + `assembly/utils.ts`):**
+
+- **KV-C1 (RESOLVED — copy-paste registration id):** `registerRootContext(..., "httpBody")` at line 185 was a leftover from the `body` example. Renamed to `"kvStore"` and class names updated (`HttpBodyRoot` → `KvStoreRoot`, `HttpBody` → `KvStoreContext`). Rebuilt and re-deployed (binary 595194).
+- **KV-C2 (RESOLVED — class names updated):** As part of KV-C1 fix. All three class references updated; no behaviour change.
+- **KV-C3 (Status code silently ignored on live edge):** `sendErrorResponse` sets `response.status` to `545` via `set_property`. Because the hook runs in `onResponseBody` (after response headers are already transmitted), this has no effect — the origin status (404 in our test) passes through. Documented in README (see KV-R2 below). Not fixable without restructuring to a response-headers hook or switching to `sendLocalResponse`; documenting is the correct path for this example.
+- **KV-C4 (No `default` in action switch):** Lines 103–155 — `switch(action)` has no `default` case. If `validateQueryParams` were somehow bypassed, an unrecognized action would produce an empty `{}` JSON body with no error indication. Cannot happen in practice (validator enforces the allowed list), but the pattern is non-defensive.
+- **KV-C5 (`"Chunked"` capitalization):** Line 53 — RFC 7230 normalizes to lowercase. Same nit as `body` B-C2. Polish.
+- **KV-C6 (Positive — `utils.ts` is well-structured):** `validateQueryParams` + `RequiredParams` pattern is clean and AS-compliant. No closures over mutable state, no try/catch, explicit types throughout.
+
+**AS compliance:** Clean — `export *` present, no `||` on strings from `get_property`, `setLogLevel(info)` set.
+
+**README Review:** ⚠️ — pass-with-issues
+
+**Findings — README Review:**
+
+- **KV-R1 (RESOLVED — KV Store setup documented):** Added "KV Store setup" section explaining create → populate → link-to-app flow, and that the `store` parameter must match the binding name.
+- **KV-R2 (RESOLVED — status code behavior documented):** Added blockquote noting that `set_property("response.status", ...)` in `onResponseBody` is advisory — origin status passes through because headers are already transmitted. Explains why error responses return 404 rather than 545.
+- **KV-R3 (No expected output section):** Happy-path log output and response format not shown in README. Would require a configured KV store to demonstrate, so left for a future example enhancement.
+
+**Next action:** **ready for sign-off** — KV-C1/C2 resolved, KV-R1/R2 resolved. KV-C3/C4/C5 and KV-R3 are polish.
+
 ### largeDictionary
 
 #### 2026-05-13 — full validation pass
@@ -1124,4 +1166,31 @@ This is purely cosmetic but should not ship — example code is copied and these
 
 ---
 
-**Last Updated:** 2026-05-19 (Phase 1 complete — 16/17 examples signed off 2026-05-19. kvStore Phase 2 only. Branch feature/more-examples-httpbin ready for merge subject to Phase 2 live-deploy parity check.)
+## kvStore Phase 2 Live-Test — COMPLETE 2026-05-19
+
+**Status:** ✅ Signed off. All steps completed.
+
+### Summary
+
+1. **Log levels fixed** — all 3 `LogLevelValues.debug` → `LogLevelValues.info` (done in prior session; binary 595153 had the fix but wrong registration id).
+2. **Registration id fixed** — `registerRootContext(..., "httpBody")` → `"kvStore"`; class names updated to `KvStoreRoot`/`KvStoreContext`; rebuilt → binary 595194.
+3. **Fixtures authored** — `no-params` + `unknown-store` (error paths; happy-path KV ops require a provisioned store).
+4. **Live test** — 2/2 scenarios pass on binary 595194; INFO logs confirmed visible in `/fastedge/v1/apps/813659/logs`.
+5. **README updated** — KV Store setup section + status-code behaviour note added.
+
+### Live infrastructure state (final)
+
+| Resource | Value |
+|---|---|
+| App name | `kv-store` |
+| App ID | 813659 |
+| Binary (current) | 595194 |
+| CDN resource | 2296532 |
+| Rule name | `livetest-kv-store` |
+| Rule ID | 22138189 |
+| Rule path | `/livetest-kv-store/` |
+| CNAME | `cdn.godronus.xyz` |
+
+---
+
+**Last Updated:** 2026-05-19 (Phase 2 complete — all 17/17 examples signed off. Branch `feature/more-examples-httpbin` ready for Phase 3 merge to `master`.)

@@ -38,6 +38,18 @@ GET /?store=my-store&action=get&key=some-key
 
 `item` - Used by Bloom Filter exists function.
 
+> **Note — error responses:** When query parameters are missing or invalid, or when the store cannot be opened, the app sets `response.status` to `545` via `set_property` and writes a JSON error body. Because this hook runs in `onResponseBody` (after response headers have already been transmitted), the status property is advisory to the CDN runtime and the origin HTTP status passes through to the client. The JSON error body is the authoritative signal.
+
+## KV Store setup
+
+Before the happy-path actions (`get`, `scan`, etc.) can be exercised, a KV Store must be created and linked to the application:
+
+1. **Create a KV Store** in the [FastEdge portal](https://portal.gcore.com) under the Key-Value storage section.
+2. **Populate it** with the keys and values you want to query.
+3. **Link the store to the app** — when configuring the FastEdge application, add the store under the app's KV store bindings. The name you give the binding is what the `store` query parameter must match at runtime.
+
+The `store` parameter in the request (e.g. `?store=my-store`) must exactly match the binding name configured on the application.
+
 ## Build
 
 ```sh
@@ -54,4 +66,4 @@ Build output:
 
 ## Deploy
 
-Upload `build/kvStore.wasm` to the [FastEdge portal](https://portal.gcore.com) and attach it to your CDN application. Ensure the KV Store you want to query is configured and linked to the application.
+Upload `build/kvStore.wasm` to the [FastEdge portal](https://portal.gcore.com) and attach it to your CDN application. Ensure the KV Store you want to query is created, populated, and linked to the application (see [KV Store setup](#kv-store-setup) above).

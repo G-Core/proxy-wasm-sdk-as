@@ -1,0 +1,12 @@
+{
+  "appType": "proxy-wasm",
+  "description": "No query parameters — app returns error before touching KV",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/",
+    "headers": {
+      "host": "example.com"
+    },
+    "body": ""
+  }
+}
