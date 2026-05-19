@@ -63,6 +63,7 @@ Files in `docs/` are **machine-generated** from source code by `./fastedge-plugi
 | `assembly/fastedge/dictionary.ts`                | `docs/SDK_API.md`  |
 | `assembly/fastedge/env.ts`                       | `docs/SDK_API.md`  |
 | `package.json` (version, exports)                | `docs/INDEX.md`    |
+| `examples/helloWorld/` (getting started guide)   | `docs/quickstart.md` |
 | `fastedge-plugin-source/manifest.json`           | `.github/copilot-instructions.md` |
 
 ### Violation example
