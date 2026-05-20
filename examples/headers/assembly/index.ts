@@ -27,22 +27,43 @@ function collectHeaders(
   return set;
 }
 
+class HeaderDiff {
+  missing: Set<string>;
+  extra: Set<string>;
+
+  constructor() {
+    this.missing = new Set<string>();
+    this.extra = new Set<string>();
+  }
+}
+
 function validateHeaders(
   headers: Headers,
   expectedHeaders: Set<string>,
-): Set<string> {
-  // Ensure the headers only contain the expected headers
+): HeaderDiff {
+  // Symmetric diff: catches both unexpected extras AND missing expected
+  // entries. Scoped to the `new-header-*` prefix — other entries are
+  // deliberately ignored so callers can add application-style headers
+  // (e.g. set-cookie) without enumerating them in expected.
+  const result = new HeaderDiff();
   const headersArr = collectHeaders(headers, false).values();
-  const diff = new Set<string>();
+  const actualNewHeaders = new Set<string>();
 
   for (let i = 0; i < headersArr.length; i++) {
     const header = headersArr[i];
     if (header.startsWith("new-header-")) {
-      const headerExists = expectedHeaders.has(header);
-      if (!headerExists) diff.add(header);
+      actualNewHeaders.add(header);
+      if (!expectedHeaders.has(header)) result.extra.add(header);
     }
   }
-  return diff;
+
+  const expectedArr = expectedHeaders.values();
+  for (let i = 0; i < expectedArr.length; i++) {
+    const e = expectedArr[i];
+    if (!actualNewHeaders.has(e)) result.missing.add(e);
+  }
+
+  return result;
 }
 
 class HttpHeadersRoot extends RootContext {
@@ -92,8 +113,7 @@ class HttpHeaders extends Context {
     stream_context.headers.request.add("new-header-02", "value-02");
     stream_context.headers.request.add("new-header-03", "value-03");
 
-    // Remove a header
-    // Known issue: - nginx will not remove the header it will set it to an empty value.
+    // Remove header, expected empty value (FastEdge/nginx sets to empty, does not delete)
     stream_context.headers.request.remove("new-header-01");
 
     // Modify a header
@@ -105,7 +125,9 @@ class HttpHeaders extends Context {
     // Try to set/add response headers
     stream_context.headers.response.add("new-response-header", "value-01");
 
-    // Ensure the "cache-control" header is present - cannot replace a header that does not exist
+    // Only blank "cache-control" when it is already set — `.replace()` upserts on
+    // FastEdge, so without this guard an absent header would be created with an
+    // empty value.
     const cacheControlHeader =
       stream_context.headers.response.get("cache-control");
     if (cacheControlHeader.length > 0) {
@@ -126,7 +148,9 @@ class HttpHeaders extends Context {
     }
 
     // Initialize expectedHeaders
+    // Note: remove sets header to empty value (not deleted) — matches FastEdge/nginx behavior
     const expectedHeaders = new Set<string>();
+    expectedHeaders.add("new-header-01:");
     expectedHeaders.add("new-header-02:new-value-02");
     expectedHeaders.add("new-header-03:value-03");
     expectedHeaders.add("new-header-03:value-03-a");
@@ -137,10 +161,10 @@ class HttpHeaders extends Context {
       expectedHeaders,
     );
 
-    if (diff.size > 0) {
+    if (diff.missing.size > 0 || diff.extra.size > 0) {
       log(
         LogLevelValues.warn,
-        `Unexpected request headers: ` + diff.values().join(", "),
+        `Request header mismatch | missing: ${diff.missing.values().join(", ")} | extra: ${diff.extra.values().join(", ")}`,
       );
       send_http_response(
         552,
@@ -172,18 +196,6 @@ class HttpHeaders extends Context {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    // Check if the "host" header is present
-    const hostHeader = stream_context.headers.response.get("host");
-    if (hostHeader && hostHeader === "") {
-      send_http_response(
-        551,
-        "internal server error",
-        String.UTF8.encode("Internal server error"),
-        [],
-      );
-      return FilterHeadersStatusValues.StopIteration;
-    }
-
     // Add new headers
     stream_context.headers.response.add("new-header-01", "value-01");
     stream_context.headers.response.add("new-header-02", "value-02");
@@ -199,7 +211,9 @@ class HttpHeaders extends Context {
     stream_context.headers.response.add("new-header-03", "value-03-a");
 
     // Initialize expectedHeaders before using it
+    // Note: remove sets header to empty value (not deleted) — matches FastEdge/nginx behavior
     const expectedHeaders = new Set<string>();
+    expectedHeaders.add("new-header-01:");
     expectedHeaders.add("new-header-02:new-value-02");
     expectedHeaders.add("new-header-03:value-03");
     expectedHeaders.add("new-header-03:value-03-a");
@@ -209,10 +223,10 @@ class HttpHeaders extends Context {
       expectedHeaders,
     );
 
-    if (diff.size > 0) {
+    if (diff.missing.size > 0 || diff.extra.size > 0) {
       log(
         LogLevelValues.warn,
-        `Unexpected response headers: ` + diff.values().join(", "),
+        `Response header mismatch | missing: ${diff.missing.values().join(", ")} | extra: ${diff.extra.values().join(", ")}`,
       );
       send_http_response(
         552,
@@ -226,13 +240,6 @@ class HttpHeaders extends Context {
     log(LogLevelValues.debug, `onResponseHeaders: OK!`);
 
     return FilterHeadersStatusValues.Continue;
-  }
-
-  onLog(): void {
-    log(
-      LogLevelValues.info,
-      "onLog >> completed (contextId): " + this.context_id.toString(),
-    );
   }
 }
 

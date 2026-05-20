@@ -1,0 +1,9 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >>",
+      "Country code: ( DE ): https://de-origin.example.com",
+      "request-url: https://de-origin.example.com"
+    ]
+  }
+}

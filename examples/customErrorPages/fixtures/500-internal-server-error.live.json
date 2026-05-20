@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "Error response detected: 500"
+    ],
+    "status": 500,
+    "contentType": "text/html",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    },
+    "bodyContains": [
+      "<title>500 — Internal Server Error</title>",
+      "<p class='code'>500</p>",
+      "<h1 class='title'>Internal Server Error</h1>",
+      "<p class='desc'>The server encountered an unexpected condition that prevented it from fulfilling the request.</p>",
+      "<p class='category'>Server Error</p>"
+    ]
+  }
+}

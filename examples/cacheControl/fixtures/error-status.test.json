@@ -1,0 +1,22 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Origin returns 500 error — sets Cache-Control: no-store regardless of content type",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "example.com",
+      "x-debugger-status": "500"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

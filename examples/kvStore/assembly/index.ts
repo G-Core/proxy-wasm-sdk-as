@@ -27,20 +27,20 @@ import {
 const INTERNAL_SERVER_ERROR: u32 = 545;
 const REQUEST_QUERY = "request.query";
 
-class HttpBodyRoot extends RootContext {
+class KvStoreRoot extends RootContext {
   createContext(context_id: u32): Context {
     setLogLevel(LogLevelValues.info); // Set the log level to info - for more logging reduce this to LogLevelValues.trace
-    return new HttpBody(context_id, this);
+    return new KvStoreContext(context_id, this);
   }
 }
 
-class HttpBody extends Context {
-  constructor(context_id: u32, root_context: HttpBodyRoot) {
+class KvStoreContext extends Context {
+  constructor(context_id: u32, root_context: KvStoreRoot) {
     super(context_id, root_context);
   }
 
   onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    log(LogLevelValues.debug, "onResponseHeaders >>");
+    log(LogLevelValues.info, "onResponseHeaders >>");
 
     // Remove "content-length" header as the body size will change in onResponseBody()
     stream_context.headers.response.remove("content-length");
@@ -66,7 +66,7 @@ class HttpBody extends Context {
       // Wait until the complete body is buffered
       return FilterDataStatusValues.StopIterationAndBuffer;
     }
-    log(LogLevelValues.debug, "onResponseBody >>");
+    log(LogLevelValues.info, "onResponseBody >>");
 
     const responseBodyMap = new Map<string, string>();
 
@@ -165,12 +165,15 @@ class HttpBody extends Context {
     return FilterDataStatusValues.Continue;
   }
 
-  private sendErrorResponse(errorMsg: string, body_buffer_length: usize): void {
+  private sendErrorResponse(
+    errorMsg: string,
+    body_buffer_length: usize
+  ): void {
     set_property(
       "response.status",
       String.UTF8.encode(INTERNAL_SERVER_ERROR.toString())
     );
-    log(LogLevelValues.debug, errorMsg);
+    log(LogLevelValues.info, errorMsg);
     set_buffer_bytes(
       BufferTypeValues.HttpResponseBody,
       0,
@@ -181,5 +184,5 @@ class HttpBody extends Context {
 }
 
 registerRootContext((context_id: u32) => {
-  return new HttpBodyRoot(context_id);
-}, "httpBody");
+  return new KvStoreRoot(context_id);
+}, "kvStore");

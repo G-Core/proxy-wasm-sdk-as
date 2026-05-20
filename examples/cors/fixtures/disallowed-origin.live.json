@@ -1,0 +1,10 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> origin: https://evil.example.com",
+      "CORS: origin not allowed: https://evil.example.com"
+    ],
+    "status": 200,
+    "contentType": "application/json"
+  }
+}

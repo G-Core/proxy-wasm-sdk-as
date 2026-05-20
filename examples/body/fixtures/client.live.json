@@ -1,0 +1,15 @@
+{
+  "expected": {
+    "logs": [
+      "url=http://fastedge-builtin.debug",
+      "contentType=text/plain",
+      "onResponseBody >> bodyStr: Original message body (36 bytes) redacted."
+    ],
+    "status": 200,
+    "body": "Original message body (36 bytes) redacted.\n",
+    "contentType": "text/plain",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    }
+  }
+}

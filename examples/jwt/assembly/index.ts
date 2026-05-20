@@ -28,14 +28,12 @@ class AuthRoot extends RootContext {
 }
 
 class Auth extends Context {
-  allow: bool = false;
-
   constructor(context_id: u32, root_context: AuthRoot) {
     super(context_id, root_context);
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    const secret = getSecret("secret");
+    const secret = getSecret("SECRET");
     if (!secret) {
       send_http_response(
         INTERNAL_SERVER_ERROR,
@@ -57,17 +55,17 @@ class Auth extends Context {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (authHeader.length == 0) {
+    if (!authHeader.startsWith("Bearer ")) {
       send_http_response(
         UNAUTHORIZED,
         "unauthorized",
-        String.UTF8.encode("No Authorization header"),
+        String.UTF8.encode("Authorization header must use Bearer scheme"),
         [],
       );
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    const token = authHeader.replace("Bearer ", "");
+    const token = authHeader.slice(7); // strip "Bearer " prefix
     if (!token) {
       send_http_response(
         UNAUTHORIZED,

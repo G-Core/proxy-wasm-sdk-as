@@ -1,0 +1,6 @@
+{
+  "expected": {
+    "contentType": "application/json",
+    "bodyContains": "App must be called with query parameters"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> origin: https://anywhere.example.com"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "headers": {
+      "access-control-allow-origin": "*",
+      "vary": "Origin",
+      "access-control-expose-headers": "X-Request-Id, X-RateLimit-Remaining"
+    }
+  }
+}

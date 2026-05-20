@@ -11,6 +11,9 @@ import {
   set_property,
   stream_context,
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
+import {
+  setLogLevel,
+} from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
 const REQUEST_URI = "request.url";
 const REQUEST_HOST = "request.host";
@@ -21,10 +24,10 @@ const REQUEST_QUERY = "request.query";
 const REQUEST_X_REAL_IP = "request.x_real_ip";
 const REQUEST_COUNTRY = "request.country";
 const REQUEST_CITY = "request.city";
-const REQUEST_VAR = "request.var";
 
 class PropertiesRoot extends RootContext {
   createContext(context_id: u32): Context {
+    setLogLevel(LogLevelValues.info);
     return new Properties(context_id, this);
   }
 }
@@ -35,76 +38,42 @@ class Properties extends Context {
   }
 
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
-    function handleProperty(
-      propertyKey: string,
-      errorCode: u32,
-      propertyName?: string,
-      headerName?: string
-    ): boolean {
-      const valueArr = get_property(propertyKey);
-      if (valueArr.byteLength === 0) {
-        send_http_response(
-          errorCode,
-          "internal server error",
-          String.UTF8.encode("Internal server error"),
-          []
-        );
-        return false;
-      }
-      const value = String.UTF8.decode(valueArr);
-      if (propertyName) {
-        log(
-          LogLevelValues.info,
-          "onRequestHeaders >> " + propertyName + ": " + value
-        );
-      }
-      if (headerName) {
-        stream_context.headers.response.add(headerName, value);
-      }
-      return true;
-    }
-
-    if (!handleProperty(REQUEST_URI, 551, "uri", "request-uri")) {
+    // Error codes 551–559 identify the absent property via the HTTP response status:
+    // 551=uri 552=host 553=path 554=scheme 555=extension 556=query 557=x_real_ip 558=country 559=city
+    if (!this.handleProperty(REQUEST_URI, 551, "uri", "request-uri")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_HOST, 552)) {
+    // host must be present for upstream routing; validated but not logged or exposed as a response header
+    if (!this.handleProperty(REQUEST_HOST, 552)) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_PATH, 553, "path", "request-path")) {
+    if (!this.handleProperty(REQUEST_PATH, 553, "path", "request-path")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_SCHEME, 554, "scheme", "request-scheme")) {
+    if (!this.handleProperty(REQUEST_SCHEME, 554, "scheme", "request-scheme")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (
-      !handleProperty(REQUEST_EXTENSION, 555, "extension", "request-extension")
-    ) {
+    if (!this.handleProperty(REQUEST_EXTENSION, 555, "extension", "request-extension", true)) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_QUERY, 556, "query", "request-query")) {
+    if (!this.handleProperty(REQUEST_QUERY, 556, "query", "request-query", true)) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (
-      !handleProperty(REQUEST_X_REAL_IP, 557, "client_ip", "request-x-real-ip")
-    ) {
+    if (!this.handleProperty(REQUEST_X_REAL_IP, 557, "client_ip", "request-x-real-ip")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_COUNTRY, 558, "country", "request-country")) {
+    if (!this.handleProperty(REQUEST_COUNTRY, 558, "country", "request-country")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
-    if (!handleProperty(REQUEST_CITY, 559, "city", "request-city")) {
-      return FilterHeadersStatusValues.StopIteration;
-    }
-
-    if (!handleProperty(REQUEST_VAR, 560)) {
+    if (!this.handleProperty(REQUEST_CITY, 559, "city", "request-city")) {
       return FilterHeadersStatusValues.StopIteration;
     }
 
@@ -140,11 +109,41 @@ class Properties extends Context {
     return FilterHeadersStatusValues.Continue;
   }
 
-  onLog(): void {
-    log(
-      LogLevelValues.info,
-      "onLog >> completed (contextId): " + this.context_id.toString()
-    );
+  // allowEmpty=true for properties that may legitimately be absent (e.g. request.extension
+  // when the path has no file extension, request.query when there is no query string).
+  // In that case the property is logged with an empty value and processing continues
+  // without adding an empty response header.
+  private handleProperty(
+    propertyKey: string,
+    errorCode: u32,
+    propertyName: string = "",
+    headerName: string = "",
+    allowEmpty: boolean = false
+  ): boolean {
+    const valueArr = get_property(propertyKey);
+    if (valueArr.byteLength === 0) {
+      if (allowEmpty) {
+        if (propertyName.length > 0) {
+          log(LogLevelValues.info, "onRequestHeaders >> " + propertyName + ": ");
+        }
+        return true;
+      }
+      send_http_response(
+        errorCode,
+        "internal server error",
+        String.UTF8.encode("Internal server error"),
+        []
+      );
+      return false;
+    }
+    const value = String.UTF8.decode(valueArr);
+    if (propertyName.length > 0) {
+      log(LogLevelValues.info, "onRequestHeaders >> " + propertyName + ": " + value);
+    }
+    if (headerName.length > 0) {
+      stream_context.headers.response.add(headerName, value);
+    }
+    return true;
   }
 }
 

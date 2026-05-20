@@ -1,0 +1,15 @@
+{
+  "expected": {
+    "logs": [
+      "url=http://fastedge-builtin.debug",
+      "contentType=text/plain",
+      "onResponseBody >> bodyStr: Hello World, this is a test message"
+    ],
+    "status": 200,
+    "body": "Hello World, this is a test message",
+    "contentType": "text/plain",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    }
+  }
+}

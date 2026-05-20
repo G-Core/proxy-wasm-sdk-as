@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "Error response detected: 502"
+    ],
+    "status": 502,
+    "contentType": "text/html",
+    "headers": {
+      "transfer-encoding": "Chunked"
+    },
+    "bodyContains": [
+      "<title>502 — Bad Gateway</title>",
+      "<p class='code'>502</p>",
+      "<h1 class='title'>Bad Gateway</h1>",
+      "<p class='desc'>The server received an invalid response from the upstream server.</p>",
+      "<p class='category'>Server Error</p>"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Unknown content type — falls back to default 10-minute public cache",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/data.csv",
+    "headers": {
+      "host": "example.com",
+      "content-type": "text/csv",
+      "x-debugger-content": "body-only"
+    },
+    "body": "col1,col2\nval1,val2"
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

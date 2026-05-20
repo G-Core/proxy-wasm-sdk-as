@@ -1,0 +1,17 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Basic request — verifies log messages are emitted at each lifecycle hook (onRequestHeaders, onRequestBody, onResponseHeaders, onResponseBody)",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "example.com"
+    },
+    "body": ""
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

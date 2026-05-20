@@ -1,0 +1,23 @@
+{
+  "appType": "proxy-wasm",
+  "description": "XML API response — same no-cache treatment as JSON when API_MAX_AGE=0",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/api/feed",
+    "headers": {
+      "host": "api.example.com",
+      "content-type": "application/xml",
+      "x-debugger-content": "body-only"
+    },
+    "body": "<feed><entry>test</entry></feed>"
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "appType": "proxy-wasm",
+  "description": "JavaScript file — treated as static asset with immutable cache",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/app.js",
+    "headers": {
+      "host": "example.com",
+      "content-type": "application/javascript",
+      "x-debugger-content": "body-only"
+    },
+    "body": "console.log('hello');"
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

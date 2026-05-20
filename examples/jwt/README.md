@@ -1,3 +1,5 @@
+[← Back to examples](../README.md)
+
 # JWT Validation
 
 This application validates a JWT Bearer token on every incoming request using the [`@gcoredev/as-jwt`](https://www.npmjs.com/package/@gcoredev/as-jwt) library.
@@ -6,10 +8,10 @@ This application validates a JWT Bearer token on every incoming request using th
 
 In `onRequestHeaders`, the app:
 
-1. Reads the HMAC secret from a FastEdge secret variable named `secret`.
-2. Extracts the `Authorization: Bearer <token>` header.
+1. Reads the HMAC secret from a FastEdge secret variable named `SECRET`.
+2. Checks that the `Authorization` header uses the `Bearer` scheme; rejects other schemes with `401`.
 3. Verifies the token signature and expiry using `jwtVerify()`.
-4. Allows the request through on a valid token, or returns `401`/`403` on missing, expired, or invalid tokens.
+4. Allows the request through on a valid token, or returns `401`/`403` on missing, invalid scheme, expired, or invalid tokens.
 
 ## Configuration
 
@@ -17,7 +19,7 @@ Set the following secret variable on your FastEdge application:
 
 | Secret   | Description                                                        |
 | -------- | ------------------------------------------------------------------ |
-| `secret` | The HMAC-SHA256 signing secret (at least 256 bits / 32 characters) |
+| `SECRET` | The HMAC-SHA256 signing secret (at least 256 bits / 32 characters) |
 
 ## Testing tokens
 
@@ -51,6 +53,6 @@ Build output:
 
 ## Deploy
 
-Upload `build/jwt.wasm` to the [FastEdge portal](https://portal.gcore.com) and attach it to your CDN application. Configure the `secret` secret variable in the application settings.
+Upload `build/jwt.wasm` to the [FastEdge portal](https://portal.gcore.com) and attach it to your CDN application. Configure the `SECRET` secret variable in the application settings.
 
 For more on secrets and secret rotation slots, see the [FastEdge secrets documentation](https://gcore.com/docs/fastedge/secrets-manager/slots).

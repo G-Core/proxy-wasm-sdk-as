@@ -1,0 +1,6 @@
+{
+  "expected": {
+    "contentType": "application/json",
+    "bodyContains": "Failed to open KvStore"
+  }
+}

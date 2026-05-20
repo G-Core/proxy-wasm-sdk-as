@@ -1,0 +1,17 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Valid token + secret configured — passes through",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "api.example.com",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjIwNTEyMjYwNjF9.zn_pSdcBo8T3SvNgMVYzWc5CU_MKqOlms7TpZXhPtJU"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  }
+}

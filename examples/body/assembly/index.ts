@@ -111,8 +111,8 @@ class HttpBody extends Context {
       log(LogLevelValues.info, `url=${url}`);
     }
 
-    // Retrieve the request URL
-    const contentTypeBytes = get_property("request.content_type");
+    // Retrieve the response content type stored in onResponseHeaders
+    const contentTypeBytes = get_property("response.content_type");
     const contentType =
       contentTypeBytes.byteLength === 0
         ? ""
@@ -130,16 +130,9 @@ class HttpBody extends Context {
 
     if (bodyBytes.byteLength > 0) {
       const bodyStr = String.UTF8.decode(bodyBytes);
-      log(LogLevelValues.info, "onHttpResponseBody >> bodyStr: " + bodyStr);
+      log(LogLevelValues.info, "onResponseBody >> bodyStr: " + bodyStr);
     }
     return FilterDataStatusValues.Continue;
-  }
-
-  onLog(): void {
-    log(
-      LogLevelValues.info,
-      "onLog >> completed (contextId): " + this.context_id.toString()
-    );
   }
 }
 

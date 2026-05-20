@@ -1,0 +1,17 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Garbage token — returns 403 Invalid",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "api.example.com",
+      "Authorization": "Bearer not-a-real-jwt-token"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  }
+}

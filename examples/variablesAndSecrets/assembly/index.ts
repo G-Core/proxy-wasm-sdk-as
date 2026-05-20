@@ -16,7 +16,7 @@ import {
 
 class VariablesRoot extends RootContext {
   createContext(context_id: u32): Context {
-    setLogLevel(LogLevelValues.debug);
+    setLogLevel(LogLevelValues.info);
     return new VariablesContext(context_id, this);
   }
 }
@@ -31,7 +31,7 @@ class VariablesContext extends Context {
     const password = getSecret("PASSWORD");
 
     log(LogLevelValues.info, "USERNAME: " + username);
-    log(LogLevelValues.info, "PASSWORD: " + password);
+    log(LogLevelValues.info, "PASSWORD: [set, length " + password.length.toString() + "]");
 
     stream_context.headers.request.add("x-env-username", username);
     stream_context.headers.request.add("x-env-password", password);

@@ -1,6 +1,6 @@
 # AssemblyScript Proxy-Wasm SDK — API Reference
 
-Complete API reference for `@gcoredev/proxy-wasm-sdk-as` version 1.2.0. This SDK enables writing CDN filter applications (proxy-wasm plugins) in AssemblyScript that compile to WebAssembly and run on the FastEdge platform.
+Complete API reference for `@gcoredev/proxy-wasm-sdk-as` version 1.2.3. This SDK enables writing CDN filter applications (proxy-wasm plugins) in AssemblyScript that compile to WebAssembly and run on the FastEdge platform.
 
 ## Quick Start
 
@@ -83,7 +83,7 @@ Your `package.json` must declare the SDK as a dependency and include `@assemblys
 ```json
 {
   "dependencies": {
-    "@gcoredev/proxy-wasm-sdk-as": "^1.2.0"
+    "@gcoredev/proxy-wasm-sdk-as": "^1.2.3"
   },
   "devDependencies": {
     "assemblyscript": "^0.28.9",
@@ -194,12 +194,13 @@ onResponseBody(body_buffer_length: usize, end_of_stream: bool): FilterDataStatus
 onLog(): void
 ```
 
+`onLog` is part of the proxy-wasm specification, and the SDK exports `proxy_on_log` for forward compatibility. **`onLog` is not dispatched on the FastEdge platform today** — neither the edge runtime nor the local test runner invokes it. Do not implement `onLog` in application code or rely on it for any logic.
+
 **Hook parameter notes:**
 
 - `headers` / `a` in header hooks is the count of headers; it is rarely needed directly since `stream_context` provides header access.
 - `body_buffer_length` is the number of bytes buffered so far. Pass it to `get_buffer_bytes` to read the body.
 - `end_of_stream` indicates whether this is the final chunk.
-- `onLog` is called after the request/response cycle is complete; request and response headers are immutable in this phase.
 
 **Critical constraint**: Response headers (`stream_context.headers.response`) are only accessible during response-phase hooks (`onResponseHeaders`, `onResponseBody`). Accessing them during request-phase hooks will panic.
 
@@ -248,7 +249,7 @@ class MyContext extends Context {
 
 ### Hook State Isolation
 
-On the FastEdge CDN platform, **a `Context` instance only exists for the duration of a single lifecycle hook invocation**. It is re-created fresh for each hook. Different hooks may execute on entirely different servers: `onRequestHeaders` runs in nginx, while `onRequestBody`, `onResponseHeaders`, `onResponseBody`, and `onLog` run in core-proxy.
+On the FastEdge CDN platform, **a `Context` instance only exists for the duration of a single lifecycle hook invocation**. It is re-created fresh for each hook. Different hooks may execute on entirely different servers: `onRequestHeaders` runs in nginx, while `onRequestBody`, `onResponseHeaders`, and `onResponseBody` run in core-proxy.
 
 This means:
 
@@ -663,7 +664,7 @@ onRequestHeaders(headers: u32, end_of_stream: bool): FilterHeadersStatusValues {
 
 ## Outbound HTTP (httpCall)
 
-Make an outbound HTTP call from the `RootContext`. The call is non-blocking: the host invokes the provided callback when the response arrives.
+Make an outbound HTTP call from within a lifecycle hook. The call is non-blocking: the host invokes the provided callback when the response arrives, then re-invokes the originating hook so processing can continue.
 
 **Import path**: `@gcoredev/proxy-wasm-sdk-as/assembly` (method on `RootContext`)
 
@@ -688,17 +689,31 @@ class RootContext {
 
 **Parameters:**
 
-| Parameter              | Type                                                                                    | Description                                                                                                              |
-| ---------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `cluster`              | `string`                                                                                | The upstream host to call. Must be a public host.                                                                        |
-| `headers`              | `Headers`                                                                               | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
-| `body`                 | `ArrayBuffer`                                                                           | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
-| `trailers`             | `Headers`                                                                               | Request trailers. Pass `[]` if none.                                                                                     |
-| `timeout_milliseconds` | `u32`                                                                                   | Request timeout in milliseconds.                                                                                         |
-| `origin_context`       | `BaseContext`                                                                           | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
-| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void`  | Callback invoked when the response is received.                                                                          |
+| Parameter              | Type                                                                                   | Description                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `cluster`              | `string`                                                                               | The upstream host to call. Must be a public host.                                                                        |
+| `headers`              | `Headers`                                                                              | Request headers. Certain headers are automatically filtered by the host (`host`, `content-length`, `transfer-encoding`). |
+| `body`                 | `ArrayBuffer`                                                                          | Request body. Pass `new ArrayBuffer(0)` for no body.                                                                     |
+| `trailers`             | `Headers`                                                                              | Request trailers. Pass `[]` if none.                                                                                     |
+| `timeout_milliseconds` | `u32`                                                                                  | Request timeout in milliseconds.                                                                                         |
+| `origin_context`       | `BaseContext`                                                                          | The context to pass back to the callback. Pass `this` from within a `Context`.                                           |
+| `cb`                   | `(origin_context: BaseContext, headers: u32, body_size: usize, trailers: u32) => void` | Callback invoked when the response is received.                                                                          |
 
-In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`.
+In the callback, read the response headers via `stream_context.headers.http_callback` and the body via `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, 0, body_size as u32)`. If `headers == 0`, the call failed (timeout or DNS failure).
+
+### HTTP Call Resume Contract
+
+The FastEdge runtime uses a host-driven resume model that differs from the generic proxy-wasm specification. When a lifecycle hook dispatches an outbound HTTP call and returns a pause value (`FilterHeadersStatusValues.StopIteration` or `StopAllIterationAndBuffer`), the runtime:
+
+1. Awaits the HTTP response.
+2. Invokes the `cb` callback. The SDK sets the effective context to `origin_context` before calling `cb`, so `stream_context.headers.http_callback` and `get_buffer_bytes(BufferTypeValues.HttpCallResponseBody, ...)` resolve against the originating request inside the callback.
+3. **Re-invokes the same lifecycle hook** on the same `Context` instance. The hook must return `FilterHeadersStatusValues.Continue` to proceed, or dispatch another call and return a pause value again.
+
+Because step 3 re-fires the hook, every hook that dispatches `httpCall` must gate re-dispatch with an instance-field latch. Without the latch, the hook dispatches a new HTTP call on every re-entry and the request loops until timeout.
+
+Instance fields on `Context` **do** persist across the re-invocation in step 3. This is the one exception to the [Hook State Isolation](#hook-state-isolation) rule: it applies only to same-hook re-entry during an `httpCall` resume, not to transitions between different lifecycle hooks.
+
+Use a **named module-level function** as the callback, not an anonymous arrow function. Named functions cannot close over mutable state and keep the dispatch call site readable:
 
 ```typescript
 import {
@@ -717,6 +732,25 @@ import {
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 export * from "@gcoredev/proxy-wasm-sdk-as/assembly/proxy";
 
+function onUpstreamResponse(
+  ctx: BaseContext,
+  hdrs: u32,
+  bodySize: usize,
+  trls: u32,
+): void {
+  if (hdrs == 0) {
+    log(LogLevelValues.warn, "HTTP call failed — timeout or DNS");
+    return;
+  }
+  const body = get_buffer_bytes(
+    BufferTypeValues.HttpCallResponseBody,
+    0,
+    bodySize as u32,
+  );
+  const self = ctx as MyContext;
+  log(LogLevelValues.info, "Response: " + String.UTF8.decode(body));
+}
+
 class MyRootContext extends RootContext {
   createContext(context_id: u32): Context {
     return new MyContext(context_id, this);
@@ -724,6 +758,8 @@ class MyRootContext extends RootContext {
 }
 
 class MyContext extends Context {
+  httpCallDispatched: bool = false;
+
   constructor(context_id: u32, root_context: MyRootContext) {
     super(context_id, root_context);
   }
@@ -732,26 +768,33 @@ class MyContext extends Context {
     headers: u32,
     end_of_stream: bool,
   ): FilterHeadersStatusValues {
+    if (this.httpCallDispatched) {
+      return FilterHeadersStatusValues.Continue;
+    }
+
     const result = (this.root_context as MyRootContext).httpCall(
-      "https://api.example.com/check",
-      [makeHeaderPair("accept", "application/json")],
+      "api.example.com",
+      [
+        makeHeaderPair(":method", "GET"),
+        makeHeaderPair(":path", "/data"),
+        makeHeaderPair(":scheme", "https"),
+        makeHeaderPair(":authority", "api.example.com"),
+        makeHeaderPair("accept", "application/json"),
+      ],
       new ArrayBuffer(0),
       [],
       5000,
       this,
-      (ctx: BaseContext, respHeaders: u32, bodySize: usize, trailers: u32) => {
-        const body = get_buffer_bytes(
-          BufferTypeValues.HttpCallResponseBody,
-          0,
-          bodySize as u32,
-        );
-        log(LogLevelValues.info, "Response: " + String.UTF8.decode(body));
-      },
+      onUpstreamResponse,
     );
-    if (result == WasmResultValues.Ok) {
-      return FilterHeadersStatusValues.StopAllIterationAndBuffer;
+
+    if (result != WasmResultValues.Ok) {
+      log(LogLevelValues.error, "httpCall dispatch failed: " + result.toString());
+      return FilterHeadersStatusValues.Continue;
     }
-    return FilterHeadersStatusValues.Continue;
+
+    this.httpCallDispatched = true;
+    return FilterHeadersStatusValues.StopIteration;
   }
 }
 
@@ -760,6 +803,8 @@ registerRootContext(
   "http-call-example",
 );
 ```
+
+If the response handler needs access to `Context` state, downcast `ctx` inside the handler: `const self = ctx as MyContext;`.
 
 ---
 
@@ -912,7 +957,7 @@ Returns a `KvStore` instance, or `null` if the store cannot be opened (e.g., the
 | `scan(pattern: string): string[]`                                   | `string[]`            | Glob-style key scan. Pattern must include a wildcard (e.g., `"foo*"`). |
 | `zrangeByScore(key: string, min: f64, max: f64): ValueScoreTuple[]` | `ValueScoreTuple[]`   | Sorted set range query: returns entries where `min <= score <= max`.    |
 | `zscan(key: string, pattern: string): ValueScoreTuple[]`            | `ValueScoreTuple[]`   | Sorted set pattern scan: matches values against the glob pattern.      |
-| `bfExists(key: string, item: string): bool`                         | `bool`                | Bloom filter membership check. Returns `true` if item may exist.       |
+| `bfExists(key: string, item: string): boolean`                      | `boolean`             | Bloom filter membership check. Returns `true` if item may exist.       |
 
 **`get` returns `ArrayBuffer | null`** — the caller must decode the buffer:
 
@@ -948,9 +993,9 @@ for (let i = 0; i < keys.length; i++) {
 ```typescript
 class ValueScoreTuple {
   value: ArrayBuffer; // The stored value bytes
-  score: f64;         // The associated score
+  score: number;      // The associated score (f64)
 
-  constructor(value: ArrayBuffer, score: f64);
+  constructor(value: ArrayBuffer, score: number);
 }
 ```
 

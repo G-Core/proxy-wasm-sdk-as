@@ -1,0 +1,9 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> origin:"
+    ],
+    "status": 200,
+    "contentType": "application/json"
+  }
+}

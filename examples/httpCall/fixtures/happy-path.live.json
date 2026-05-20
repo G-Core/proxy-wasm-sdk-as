@@ -1,0 +1,13 @@
+{
+  "expected": {
+    "logs": [
+      "onRequestHeaders >> dispatching HTTP call",
+      "HTTP call dispatched, pausing request",
+      "Response body (",
+      "\"origin\":",
+      "HTTP call response received, resuming request."
+    ],
+    "status": 200,
+    "contentType": "application/json"
+  }
+}

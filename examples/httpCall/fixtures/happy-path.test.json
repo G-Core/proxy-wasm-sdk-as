@@ -1,0 +1,17 @@
+{
+  "appType": "proxy-wasm",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "fastedge-builtin.debug"
+    },
+    "body": ""
+  },
+  "properties": {},
+  "logLevel": 0,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

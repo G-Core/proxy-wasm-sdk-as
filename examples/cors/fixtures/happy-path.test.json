@@ -1,0 +1,22 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Allowed origin with GET request — adds CORS response headers and Vary: Origin",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/api/data",
+    "headers": {
+      "host": "api.example.com",
+      "Origin": "https://app.example.com"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

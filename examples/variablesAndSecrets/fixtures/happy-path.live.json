@@ -1,0 +1,14 @@
+{
+  "expected": {
+    "logs": [
+      "USERNAME: cdn-test-user",
+      "PASSWORD: [set, length 15]"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "bodyContains": [
+      "\"x-env-username\":\"cdn-test-user\"",
+      "\"x-env-password\":\"cdn-test-secret\""
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Returning visitor with variant A cookie — routes to variant A path",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug",
+    "headers": {
+      "host": "example.com",
+      "Cookie": "fe_exp_homepage-hero=A"
+    },
+    "body": ""
+  },
+  "properties": {
+    "request.host": "example.com",
+    "request.path": "/landing",
+    "request.url": "http://example.com/landing"
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "."
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

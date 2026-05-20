@@ -1,0 +1,11 @@
+{
+  "expected": {
+    "logs": [
+      "Cache-Control: public, max-age=600 (content-type: text/csv)"
+    ],
+    "status": 200,
+    "headers": {
+      "cache-control": "public, max-age=600"
+    }
+  }
+}

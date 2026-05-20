@@ -9,7 +9,7 @@ import {
 } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 import { getCurrentTime } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 
-function printCurrentDate(): string {
+function getCurrentDateString(): string {
   const date = new Date(getCurrentTime());
   return date.toISOString();
 }
@@ -28,7 +28,7 @@ class LogTime extends Context {
   onRequestHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     log(
       LogLevelValues.info,
-      "onRequestHeaders >> currentTime: " + printCurrentDate()
+      "onRequestHeaders >> currentTime: " + getCurrentDateString()
     );
     return FilterHeadersStatusValues.Continue;
   }
@@ -36,16 +36,9 @@ class LogTime extends Context {
   onResponseHeaders(a: u32, end_of_stream: bool): FilterHeadersStatusValues {
     log(
       LogLevelValues.info,
-      "onResponseHeaders >> currentTime: " + printCurrentDate()
+      "onResponseHeaders >> currentTime: " + getCurrentDateString()
     );
     return FilterHeadersStatusValues.Continue;
-  }
-
-  onLog(): void {
-    log(
-      LogLevelValues.info,
-      "onLog >> completed (contextId): " + this.context_id.toString()
-    );
   }
 }
 

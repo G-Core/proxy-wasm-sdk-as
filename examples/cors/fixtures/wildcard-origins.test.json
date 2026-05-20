@@ -1,0 +1,22 @@
+{
+  "appType": "proxy-wasm",
+  "description": "Wildcard ALLOWED_ORIGINS=* — returns * as Access-Control-Allow-Origin for any origin",
+  "request": {
+    "method": "GET",
+    "url": "http://fastedge-builtin.debug/api/public",
+    "headers": {
+      "host": "api.example.com",
+      "Origin": "https://anywhere.example.com"
+    },
+    "body": ""
+  },
+  "dotenv": {
+    "enabled": true,
+    "path": "wildcard/"
+  },
+  "logLevel": 2,
+  "wasm": {
+    "path": "<workspace>/.fastedge-debug/app.wasm",
+    "description": "Default debugger WASM binary"
+  }
+}

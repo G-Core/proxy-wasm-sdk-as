@@ -1,0 +1,19 @@
+{
+  "expected": {
+    "logs": [
+      "A/B routing: http://example.com/b/landing",
+      "A/B test \"homepage-hero\": variant B, path /b/landing"
+    ],
+    "status": 200,
+    "contentType": "application/json",
+    "headers": {
+      "x-variant": "B",
+      "set-cookie": "fe_exp_homepage-hero=B; Path=/; Max-Age=86400; SameSite=Lax"
+    },
+    "bodyContains": [
+      "\"x-experiment\":\"homepage-hero\"",
+      "\"x-variant\":\"B\"",
+      "\"requestUrl\":\"http://example.com/b/landing\""
+    ]
+  }
+}

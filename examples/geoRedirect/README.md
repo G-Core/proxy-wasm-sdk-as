@@ -1,14 +1,20 @@
+[← Back to examples](../README.md)
+
 # Geo Redirect
 
 This application redirects requests to different origin URLs based on the client's country code.
 
 ## What it does
 
-In `onRequestHeaders`, the app reads the client's country code from the `request.country` runtime property (Geo-IP data) and looks up a matching environment variable by that country code. The `request.url` runtime property is then set to route the request to the corresponding origin.
+In `onRequestHeaders`, the app reads the client's country code from the `request.country` runtime property (populated by FastEdge's Geo-IP data) and looks up a matching environment variable by that country code. The `request.url` runtime property is then set to route the upstream fetch to the corresponding origin.
 
 - If a country-specific origin is configured (e.g. env var `DE=https://de.example.com`), the request is routed there.
 - Otherwise it falls back to the `DEFAULT` origin.
 - Uses [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) country codes.
+
+> **Routing mechanism:** This is not an HTTP redirect (no `Location` header, no 302 response). Setting `request.url` rewrites the upstream fetch target transparently — the client sees a normal 200 response from the matched origin.
+
+> **Observability:** The app logs the country code, matched origin, and final request URL at INFO level, visible in the FastEdge application logs.
 
 ## Configuration
 
