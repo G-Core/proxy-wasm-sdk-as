@@ -52,6 +52,8 @@ registerRootContext(
 );
 ```
 
+**No default parameters on nested functions**: AssemblyScript compiles functions defined inside a method body to `call_indirect` entries in the WebAssembly element table. Default parameter values are applied at direct call sites only — for indirect calls, unspecified argument slots receive `0` (a null pointer). If those slots are used as strings or objects, the wasm traps with a memory access out-of-bounds error at runtime. Fix: promote the helper to a `private` class method (dispatched as a direct call; defaults apply correctly), or pass all arguments explicitly at every call site.
+
 ### Build Configuration
 
 The `asconfig.json` at the root of your plugin must include the `abort` override. Without it, runtime errors in the wasm module will not be surfaced correctly.
@@ -871,14 +873,22 @@ function getEnv(name: string): string;
 
 Returns the value of the environment variable, or an empty string if the variable is not set.
 
+**Empty string fallback**: AssemblyScript's `||` operator performs a pointer-non-null check, not a value-falsy check. `getEnv("X") || "default"` returns `""` rather than `"default"` when the variable is unset, because the empty-string object has a non-zero pointer. Use an explicit check instead:
+
+```typescript
+const raw = getEnv("X");
+const val = raw === "" ? "default" : raw;
+```
+
+The `!str` unary operator is correct and returns `true` for both `null` and `""`.
+
 ```typescript
 import { getEnv } from "@gcoredev/proxy-wasm-sdk-as/assembly/fastedge";
 import { log, LogLevelValues } from "@gcoredev/proxy-wasm-sdk-as/assembly";
 
-const blocklist = getEnv("BLOCKLIST");
-if (blocklist.length == 0) {
-  log(LogLevelValues.warn, "BLOCKLIST env var is not set");
-}
+const raw = getEnv("BLOCKLIST");
+const blocklist = raw === "" ? "none" : raw;
+log(LogLevelValues.info, "Blocklist: " + blocklist);
 ```
 
 ### Dictionary (getDictionary)
@@ -916,6 +926,8 @@ function getSecretEffectiveAt(name: string, effectiveAt: u32): string;
 `getSecret` returns the current value of the named secret, or an empty string if not found.
 
 `getSecretEffectiveAt` reads a secret from a specific rotation slot. Slots are defined in the FastEdge UI and are always numeric (e.g., incremental integers, or timestamp-style values representing a point in time). Use this for secret rotation: pass the current Unix timestamp in seconds as `effectiveAt`. The host selects the slot where `effectiveAt >= secret_slots.slot`.
+
+**Empty string fallback**: AssemblyScript's `||` operator does not fall back on empty strings. `getSecret("KEY") || "default"` returns `""` rather than `"default"` when the secret is unset. Use an explicit check: `const raw = getSecret("KEY"); const key = raw === "" ? "default" : raw;`. The `!str` unary operator is correct and returns `true` for both `null` and `""`.
 
 ```typescript
 import {
